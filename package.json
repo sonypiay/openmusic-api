@@ -1,0 +1,22 @@
+{
+  "name": "openmusic-api",
+  "version": "1.0.0",
+  "description": "Submission Proyek OpenMusic API V1 - Dicoding Indonesia",
+  "license": "ISC",
+  "author": "sonypiay",
+  "type": "module",
+  "main": "serve.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@hapi/hapi": "^21.4.0",
+    "dotenv": "^17.2.0",
+    "joi": "^17.13.3",
+    "pg": "^8.16.3",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "node-pg-migrate": "^8.0.3"
+  }
+}
