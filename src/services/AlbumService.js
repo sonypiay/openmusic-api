@@ -1,3 +1,6 @@
+import { v4 as uuidv4 } from 'uuid';
+import AlbumRepository from "../repositories/AlbumRepository.js";
+
 class AlbumService {
     async getById (id) {
         return {
@@ -7,9 +10,13 @@ class AlbumService {
      }
 
      async create (data) {
+        data.id = uuidv4();
+
+        const result = await AlbumRepository.create(data);
+
         return {
             data: {
-                album: data,
+                albumId: result,
             },
         };
      }

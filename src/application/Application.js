@@ -19,7 +19,7 @@ class Application {
     }
 
     async run() {
-        this.server.events.on('log', (event, tags) => {
+        this.server.events.on('request', (request, event, tags) => {
             if( tags.error ) {
                 Logging.error(event.error ? event.error.message : 'Unknown error');
             }
