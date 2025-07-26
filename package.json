@@ -7,15 +7,15 @@
   "type": "module",
   "main": "main.js",
   "scripts": {
-    "dev": "node src/main.js",
+    "dev": "nodemon --env-file=.env ./src/main.js",
     "migrate": "node-pg-migrate"
   },
   "dependencies": {
     "@hapi/hapi": "^21.4.0",
-    "dotenv": "^17.2.0",
     "joi": "^17.13.3",
     "pg": "^8.16.3",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "winston": "^3.17.0"
   },
   "devDependencies": {
     "node-pg-migrate": "^8.0.3",

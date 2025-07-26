@@ -1,9 +1,23 @@
-import hapi from '@hapi/hapi';
+import Application from './application/Application.js';
+import ResponseException from "./exception/ResponseException.js";
+import Plugins from "./plugins/Plugins.js";
 
-const server = hapi.server({
-    port: 3000,
-    host: 'localhost'
+const app = new Application();
+
+app.server.ext('onPreResponse', (request, h) => {
+    const { response } = request;
+
+    if( response instanceof ResponseException ) {
+        return h.response({
+            status: response.status,
+            message: response.message,
+        })
+            .code(response.statusCode);
+    }
+
+    return h.continue;
 });
 
-await server.start();
-console.log('Server running on %s', server.info.uri);
+await app.register(Plugins);
+
+await app.run();
