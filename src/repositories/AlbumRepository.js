@@ -1,18 +1,57 @@
-import {DatabaseConnection} from "../application/DatabaseConnection.js";
+import { Pool } from 'pg';
 
 class AlbumRepository {
     constructor() {
-        this.table = 'albums';
+        this.connection = new Pool();
     }
 
     async create(data) {
         const query = {
-            text: 'INSERT INTO albums (id, title, year) VALUES ($1, $2, $3) RETURNING id',
-            values: [data.id, data.title, data.year],
+            text: `INSERT INTO albums (id, name, year) VALUES ($1, $2, $3) RETURNING id`,
+            values: [data.id, data.name, data.year],
         };
 
-        const result = await DatabaseConnection.query(query);
+        const result = await this.connection.query(query);
         return result.rows[0].id;
+    }
+
+    async getById(id) {
+        const query = {
+            text: `SELECT * FROM albums WHERE id = $1`,
+            values: [id],
+        };
+
+        const result = await this.connection.query(query);
+        return result.rows.length > 0 ? result.rows[0] : null;
+    }
+
+    async update(id, data) {
+        const query = {
+            text: `UPDATE albums SET name = $1, year = $2 WHERE id = $3`,
+            values: [data.name, data.year, id],
+        };
+
+        const result = await this.connection.query(query);
+        return result.rows[0];
+    }
+
+    async delete(id) {
+        const query = {
+            text: `DELETE FROM albums WHERE id = $1`,
+            values: [id],
+        };
+
+        return await this.connection.query(query);
+    }
+
+    async existsById(id) {
+        const query = {
+            text: `SELECT id FROM albums WHERE id = $1`,
+            values: [id],
+        };
+
+        const result = await this.connection.query(query);
+        return result.rows.length > 0;
     }
 }
 

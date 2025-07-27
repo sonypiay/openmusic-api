@@ -15,7 +15,7 @@ export const up = (pgm) => {
             primaryKey: true,
             notNull: true,
         },
-        title: {
+        name: {
             type: 'varchar(255)',
             notNull: true,
         },

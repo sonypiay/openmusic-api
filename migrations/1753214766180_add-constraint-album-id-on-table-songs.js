@@ -16,6 +16,8 @@ export const up = (pgm) => {
             onDelete: 'CASCADE',
         },
     });
+
+    pgm.addIndex('songs', 'album_id');
 };
 
 /**
@@ -25,5 +27,5 @@ export const up = (pgm) => {
  */
 export const down = (pgm) => {
     pgm.dropConstraint('songs', 'songs_album_id_foreign');
-    pgm.dropIndex('songs', 'songs_album_id_foreign');
+    pgm.dropIndex('songs', 'album_id');
 };
