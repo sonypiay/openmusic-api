@@ -1,4 +1,5 @@
 import AlbumService from "../services/AlbumService.js";
+import AlbumValidation from "../validation/AlbumValidation.js";
 
 class AlbumController {
     async getById (req, res){
@@ -13,7 +14,7 @@ class AlbumController {
     }
 
     async create (req, res) {
-        const payload = req.payload;
+        const payload = AlbumValidation.createOrUpdate(req.payload);
         const result = await AlbumService.create(payload);
 
         return res.response({
@@ -24,7 +25,7 @@ class AlbumController {
 
     async update (req, res) {
         const { id } = req.params;
-        const payload = req.payload;
+        const payload = AlbumValidation.createOrUpdate(req.payload);
         const result = await AlbumService.update(id, payload);
 
         return res.response({
