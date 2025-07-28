@@ -1,15 +1,17 @@
 import Validation from "./Validation.js";
 import Joi from "joi";
 
-class AlbumValidation extends Validation {
+class SongsValidation extends Validation {
     createOrUpdate(request) {
         const schema = Joi.object({
-            name: Joi.string().max(100).required(),
+            title: Joi.string().max(255).required(),
             year: Joi.number().required(),
+            genre: Joi.string().max(255).required(),
+            performer: Joi.string().max(255).required(),
         });
 
         return this.validate(schema, request);
     }
 }
 
-export default AlbumValidation;
+export default SongsValidation;

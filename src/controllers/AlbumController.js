@@ -2,10 +2,15 @@ import AlbumService from "../services/AlbumService.js";
 import AlbumValidation from "../validation/AlbumValidation.js";
 
 class AlbumController {
+    constructor() {
+        this.albumService = new AlbumService;
+        this.validate = new AlbumValidation;
+    }
+
     async getById (req, res){
         const { id } = req.params;
 
-        const result = await AlbumService.getById(id);
+        const result = await this.albumService.getById(id);
 
         return res.response({
             status: "success",
@@ -14,8 +19,8 @@ class AlbumController {
     }
 
     async create (req, res) {
-        const payload = AlbumValidation.createOrUpdate(req.payload);
-        const result = await AlbumService.create(payload);
+        const payload = this.validate.createOrUpdate(req.payload);
+        const result = await this.albumService.create(payload);
 
         return res.response({
             status: "success",
@@ -25,22 +30,22 @@ class AlbumController {
 
     async update (req, res) {
         const { id } = req.params;
-        const payload = AlbumValidation.createOrUpdate(req.payload);
-        const result = await AlbumService.update(id, payload);
+        const payload = this.validate.createOrUpdate(req.payload);
+        const result = await this.albumService.update(id, payload);
 
         return res.response({
             status: "success",
-            ...result,
+            message: "Album has been updated",
         }).code(200);
     }
 
     async delete (req, res) {
         const { id } = req.params;
-        const result = await AlbumService.delete(id);
+        const result = await this.albumService.delete(id);
 
         return res.response({
             status: "success",
-            ...result,
+            message: "Album has been deleted",
         });
     }
 }

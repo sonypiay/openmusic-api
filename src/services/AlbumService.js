@@ -3,8 +3,12 @@ import AlbumRepository from "../repositories/AlbumRepository.js";
 import ResponseException from "../exception/ResponseException.js";
 
 class AlbumService {
+    constructor() {
+        this.albumRepository = new AlbumRepository;
+    }
+    
     async getById (id) {
-        const result = await AlbumRepository.getById(id);
+        const result = await this.albumRepository.getById(id);
 
         if( ! result ) {
             throw new ResponseException(404, 'fail', 'Album not found');
@@ -14,13 +18,13 @@ class AlbumService {
             data: {
                 album: result,
             }
-        }
+        };
      }
 
      async create (data) {
         data.id = uuidv4();
 
-        const result = await AlbumRepository.create(data);
+        const result = await this.albumRepository.create(data);
 
         return {
             data: {
@@ -30,32 +34,24 @@ class AlbumService {
      }
 
      async update (id, data) {
-        const existsById = await AlbumRepository.existsById(id);
+        const existsById = await this.albumRepository.existsById(id);
 
         if(!existsById) {
             throw new ResponseException(404, 'fail', 'Album not found');
         }
 
-        await AlbumRepository.update(id, data);
-
-        return {
-            message: "Album updated successfully"
-        }
+        await this.albumRepository.update(id, data);
      }
 
      async delete (id) {
-        const existsById = await AlbumRepository.existsById(id);
+        const existsById = await this.albumRepository.existsById(id);
 
         if( ! existsById ) {
             throw new ResponseException(404, 'fail', 'Album not found');
         }
 
-        await AlbumRepository.delete(id);
-
-        return {
-            message: "Album deleted successfully"
-        }
+        await this.albumRepository.delete(id);
      }
 }
 
-export default new AlbumService;
+export default AlbumService;

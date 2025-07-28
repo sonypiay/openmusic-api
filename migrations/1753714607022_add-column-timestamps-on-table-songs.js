@@ -9,15 +9,18 @@ export const shorthands = undefined;
  * @returns {Promise<void> | void}
  */
 export const up = (pgm) => {
-    pgm.addConstraint('songs', 'songs_album_id_foreign', {
-        foreignKeys: {
-            columns: 'album_id',
-            references: 'albums(id)',
-            onDelete: 'SET NULL',
+    pgm.addColumn('songs', {
+        created_at: {
+            type: 'timestamp',
+            notNull: true,
+            default: pgm.func('now()'),
         },
+        updated_at: {
+            type: 'timestamp',
+            notNull: true,
+            default: pgm.func('now()'),
+        }
     });
-
-    pgm.addIndex('songs', 'album_id');
 };
 
 /**
@@ -26,6 +29,6 @@ export const up = (pgm) => {
  * @returns {Promise<void> | void}
  */
 export const down = (pgm) => {
-    pgm.dropConstraint('songs', 'songs_album_id_foreign');
-    pgm.dropIndex('songs', 'album_id');
+    pgm.dropColumn('songs', 'created_at');
+    pgm.dropColumn('songs', 'updated_at');
 };

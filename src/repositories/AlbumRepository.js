@@ -7,8 +7,14 @@ class AlbumRepository {
 
     async create(data) {
         const query = {
-            text: `INSERT INTO albums (id, name, year) VALUES ($1, $2, $3) RETURNING id`,
-            values: [data.id, data.name, data.year],
+            text: `INSERT INTO albums (id, name, year, created_at, updated_at) VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+            values: [
+                data.id,
+                data.name,
+                data.year,
+                new Date().toISOString(),
+                new Date().toISOString()
+            ],
         };
 
         const result = await this.connection.query(query);
@@ -27,8 +33,8 @@ class AlbumRepository {
 
     async update(id, data) {
         const query = {
-            text: `UPDATE albums SET name = $1, year = $2 WHERE id = $3`,
-            values: [data.name, data.year, id],
+            text: `UPDATE albums SET name = $1, year = $2, updated_at = $3 WHERE id = $4`,
+            values: [data.name, data.year, new Date().toISOString(), id],
         };
 
         const result = await this.connection.query(query);
@@ -55,4 +61,4 @@ class AlbumRepository {
     }
 }
 
-export default new AlbumRepository;
+export default AlbumRepository;

@@ -38,7 +38,7 @@ export const up = (pgm) => {
         },
         album_id: {
             type: 'varchar(50)',
-            notNull: true,
+            notNull: false,
         }
     }, {
         ifNotExists: true,
