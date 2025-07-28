@@ -1,5 +1,6 @@
 import hapi from '@hapi/hapi';
 import Logging from "./Logging.js";
+import ResponseException from "../exception/ResponseException.js";
 
 class Application {
     constructor() {
@@ -23,6 +24,31 @@ class Application {
             if( tags.error ) {
                 Logging.error(event.error.message);
             }
+        });
+
+        this.server.ext('onPreResponse', (request, h) => {
+            const { response } = request;
+
+            if( response instanceof ResponseException ) {
+                return h.response({
+                    status: response.status,
+                    message: response.message,
+                })
+                    .code(response.statusCode);
+            }
+
+            if( response.isBoom ) {
+                if( response.output.statusCode === 500 ) {
+                    Logging.error(response.message);
+
+                    return h.response({
+                        status: "error",
+                        message: "Whoops, something went wrong.",
+                    });
+                }
+            }
+
+            return h.continue;
         });
 
         await this.server.start();
