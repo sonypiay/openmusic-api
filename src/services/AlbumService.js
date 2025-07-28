@@ -6,7 +6,12 @@ class AlbumService {
     constructor() {
         this.albumRepository = new AlbumRepository;
     }
-    
+
+    /**
+     * Get album by ID
+     * @param id
+     * @returns {Promise<{data: {album: *}}>}
+     */
     async getById (id) {
         const result = await this.albumRepository.getById(id);
 
@@ -21,6 +26,12 @@ class AlbumService {
         };
      }
 
+    /**
+     * Create a new album
+     *
+     * @param data
+     * @returns {Promise<{data: {albumId: string}}>}
+     */
      async create (data) {
         data.id = uuidv4();
 
@@ -33,6 +44,13 @@ class AlbumService {
         };
      }
 
+    /**
+     * Update existing album by ID
+     *
+     * @param id
+     * @param data
+     * @returns {Promise<void>}
+     */
      async update (id, data) {
         const existsById = await this.albumRepository.existsById(id);
 
@@ -43,6 +61,12 @@ class AlbumService {
         await this.albumRepository.update(id, data);
      }
 
+    /**
+     * Delete existing album by ID
+     *
+     * @param id
+     * @returns {Promise<void>}
+     */
      async delete (id) {
         const existsById = await this.albumRepository.existsById(id);
 

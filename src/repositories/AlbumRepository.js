@@ -5,6 +5,12 @@ class AlbumRepository {
         this.connection = new Pool();
     }
 
+    /**
+     * Create a new album
+     *
+     * @param data
+     * @returns {Promise<string>}
+     */
     async create(data) {
         const query = {
             text: `INSERT INTO albums (id, name, year, created_at, updated_at) VALUES ($1, $2, $3, $4, $5) RETURNING id`,
@@ -21,6 +27,12 @@ class AlbumRepository {
         return result.rows[0].id;
     }
 
+    /**
+     * Get album by ID
+     *
+     * @param id
+     * @returns {Promise<*|null>}
+     */
     async getById(id) {
         const query = {
             text: `SELECT * FROM albums WHERE id = $1`,
@@ -42,25 +54,43 @@ class AlbumRepository {
         return result.rows[0];
     }
 
+    /**
+     * Update existing album by ID
+     *
+     * @param id
+     * @param data
+     * @returns {Promise<void>}
+     */
     async update(id, data) {
         const query = {
             text: `UPDATE albums SET name = $1, year = $2, updated_at = $3 WHERE id = $4`,
             values: [data.name, data.year, new Date().toISOString(), id],
         };
 
-        const result = await this.connection.query(query);
-        return result.rows[0];
+        await this.connection.query(query);
     }
 
+    /**
+     * Delete existing album
+     *
+     * @param id
+     * @returns {Promise<void>}
+     */
     async delete(id) {
         const query = {
             text: `DELETE FROM albums WHERE id = $1`,
             values: [id],
         };
 
-        return await this.connection.query(query);
+        await this.connection.query(query);
     }
 
+    /**
+     * Check if album is exists by ID
+     *
+     * @param id
+     * @returns {Promise<boolean>}
+     */
     async existsById(id) {
         const query = {
             text: `SELECT id FROM albums WHERE id = $1`,

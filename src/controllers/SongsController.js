@@ -8,6 +8,13 @@ class SongsController {
         this.validate = new SongsValidation;
     }
 
+    /**
+     * Get list of songs
+     *
+     * @param req
+     * @param res
+     * @returns {Promise<*>}
+     */
     async getAll(req, res) {
         const result = await this.songsSevice.getAll(req);
 
@@ -17,6 +24,13 @@ class SongsController {
         });
     }
 
+    /**
+     * Get songs by ID
+     *
+     * @param req
+     * @param res
+     * @returns {Promise<*>}
+     */
     async getById(req, res) {
         const { id } = req.params;
         const result = await this.songsSevice.getById(id);
@@ -27,6 +41,13 @@ class SongsController {
         });
     }
 
+    /**
+     * Create a new song
+     *
+     * @param req
+     * @param res
+     * @returns {Promise<*>}
+     */
     async create(req, res) {
         const payload = this.validate.createOrUpdate(req.payload);
         payload.id = uuidv4();
@@ -39,6 +60,13 @@ class SongsController {
         }).code(201);
     }
 
+    /**
+     * Update existing song
+     *
+     * @param req
+     * @param res
+     * @returns {Promise<*>}
+     */
     async update(req, res) {
         const { id } = req.params;
         const payload = this.validate.createOrUpdate(req.payload);
@@ -51,6 +79,13 @@ class SongsController {
         });
     }
 
+    /**
+     * Delete existing song
+     *
+     * @param req
+     * @param res
+     * @returns {Promise<*>}
+     */
     async delete(req, res) {
         const { id } = req.params;
 

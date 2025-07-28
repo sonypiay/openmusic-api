@@ -7,6 +7,12 @@ class SongsService
         this.songsRepository = new SongsRepository;
     }
 
+    /**
+     * Get list of songs
+     *
+     * @param request
+     * @returns {Promise<{data: {songs: *}>}
+     */
     async getAll(request) {
         const result = await this.songsRepository.getAll(request.query);
 
@@ -17,6 +23,12 @@ class SongsService
         };
     }
 
+    /**
+     * Get songs by ID
+     *
+     * @param id
+     * @returns {Promise<{data: {song: *}}>}
+     */
     async getById(id) {
         const result = await this.songsRepository.getById(id);
         if( ! result ) throw new ResponseException(404, 'fail', 'Song not found');
@@ -28,6 +40,11 @@ class SongsService
         };
     }
 
+    /**
+     * Create a new song
+     * @param data
+     * @returns {Promise<{data: {songId: string}}>}
+     */
     async create(data) {
         const result = await this.songsRepository.create(data);
 
@@ -38,6 +55,13 @@ class SongsService
         };
     }
 
+    /**
+     * Update existsing song
+     *
+     * @param id
+     * @param data
+     * @returns {Promise<void>}
+     */
     async update(id, data) {
         const existsById = await this.songsRepository.existsById(id);
         if( ! existsById ) throw new ResponseException(404, 'fail', 'Song not found')
@@ -45,6 +69,12 @@ class SongsService
         await this.songsRepository.update(id, data);
     }
 
+    /**
+     * Delete existing song
+     *
+     * @param id
+     * @returns {Promise<void>}
+     */
     async delete(id) {
         const existsById = await this.songsRepository.existsById(id);
         if( ! existsById ) throw new ResponseException(404, 'fail', 'Song not found')

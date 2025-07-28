@@ -5,6 +5,12 @@ class SongsRepository {
         this.connection = new Pool();
     }
 
+    /**
+     * Store a new song
+     *
+     * @param data
+     * @returns {Promise<string>}
+     */
     async create(data) {
         const sqlText = `
             INSERT INTO songs (
@@ -48,6 +54,13 @@ class SongsRepository {
         return result.rows[0].id;
     }
 
+    /**
+     * Update existing song by ID
+     *
+     * @param id
+     * @param data
+     * @returns {Promise<*>}
+     */
     async update(id, data) {
         const sqlText = `
             UPDATE songs SET
@@ -72,12 +85,17 @@ class SongsRepository {
                 new Date().toISOString(),
                 id
             ],
-        }
+        };
 
-        const result = await this.connection.query(query);
-        return result.rows[0];
+        await this.connection.query(query);
     }
 
+    /**
+     * Check if song is exists by ID
+     *
+     * @param id
+     * @returns {Promise<boolean>}
+     */
     async existsById(id) {
         const sqlText = `SELECT id FROM songs WHERE id = $1`;
         const query = {
@@ -89,6 +107,12 @@ class SongsRepository {
         return result.rows.length > 0;
     }
 
+    /**
+     * Get detail song by ID
+     *
+     * @param id
+     * @returns {Promise<*|null>}
+     */
     async getById(id) {
         const sqlText = `
         SELECT
@@ -111,6 +135,12 @@ class SongsRepository {
         return result.rows[0] ?? null;
     }
 
+    /**
+     * Get all songs
+     *
+     * @param request
+     * @returns {Promise<*>}
+     */
     async getAll(request) {
         const whereConditions = [];
         const queryValues = [];
@@ -142,6 +172,12 @@ class SongsRepository {
         return result.rows;
     }
 
+    /**
+     * Delete existing song by ID
+     *
+     * @param id
+     * @returns {Promise<void>}
+     */
     async delete(id) {
         const sqlText = `DELETE FROM songs WHERE id = $1`;
         const query = {
