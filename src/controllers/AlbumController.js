@@ -52,7 +52,7 @@ class AlbumController {
     async update (req, res) {
         const { id } = req.params;
         const payload = this.validate.createOrUpdate(req.payload);
-        const result = await this.albumService.update(id, payload);
+        await this.albumService.update(id, payload);
 
         return res.response({
             status: "success",
@@ -69,7 +69,7 @@ class AlbumController {
      */
     async delete (req, res) {
         const { id } = req.params;
-        const result = await this.albumService.delete(id);
+        await this.albumService.delete(id);
 
         return res.response({
             status: "success",
