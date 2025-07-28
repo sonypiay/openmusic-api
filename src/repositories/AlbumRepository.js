@@ -33,6 +33,9 @@ class AlbumRepository {
         };
 
         const result = await this.connection.query(query);
+
+        if( ! result.rows.length ) return null;
+
         const resultSongs = await this.connection.query(querySongs);
 
         result.rows[0].songs = resultSongs.rows.length > 0 ? resultSongs.rows : [];

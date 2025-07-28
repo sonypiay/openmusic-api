@@ -108,7 +108,7 @@ class SongsRepository {
         };
 
         const result = await this.connection.query(query);
-        return result.rows[0];
+        return result.rows[0] ?? null;
     }
 
     async getAll(request) {
