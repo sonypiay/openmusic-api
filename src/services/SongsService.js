@@ -7,8 +7,8 @@ class SongsService
         this.songsRepository = new SongsRepository;
     }
 
-    async getAll() {
-        const result = await this.songsRepository.getAll();
+    async getAll(request) {
+        const result = await this.songsRepository.getAll(request.query);
 
         return {
             data: {

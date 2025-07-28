@@ -111,10 +111,31 @@ class SongsRepository {
         return result.rows[0];
     }
 
-    async getAll() {
-        const sqlText = `SELECT id, title, performer FROM songs ORDER BY title DESC`;
+    async getAll(request) {
+        const whereConditions = [];
+        const queryValues = [];
+        let indexParam = 0;
+
+        if( request ) {
+            if( request.title && request.title !== '' ) {
+                ++indexParam;
+                whereConditions.push(`title ILIKE $${indexParam}`);
+                queryValues.push(`%${request.title}%`);
+            }
+
+            if( request.performer && request.performer !== '' ) {
+                ++indexParam;
+                whereConditions.push(`performer ILIKE $${indexParam}`);
+                queryValues.push(`%${request.performer}%`);
+            }
+        }
+
+        const queryWhereConditions = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
+
+        const sqlText = `SELECT id, title, performer FROM songs ${queryWhereConditions} ORDER BY title DESC`;
         const query = {
             text: sqlText,
+            values: queryValues,
         };
 
         const result = await this.connection.query(query);

@@ -9,7 +9,7 @@ class SongsController {
     }
 
     async getAll(req, res) {
-        const result = await this.songsSevice.getAll();
+        const result = await this.songsSevice.getAll(req);
 
         return res.response({
             status: "success",
