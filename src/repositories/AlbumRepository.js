@@ -27,8 +27,16 @@ class AlbumRepository {
             values: [id],
         };
 
+        const querySongs = {
+            text: `SELECT id, title, performer FROM songs WHERE album_id = $1`,
+            values: [id]
+        };
+
         const result = await this.connection.query(query);
-        return result.rows.length > 0 ? result.rows[0] : null;
+        const resultSongs = await this.connection.query(querySongs);
+
+        result.rows[0].songs = resultSongs.rows.length > 0 ? resultSongs.rows : [];
+        return result.rows[0];
     }
 
     async update(id, data) {
