@@ -4,20 +4,28 @@
  * @returns {Promise<void> | void}
  */
 export const up = (pgm) => {
-    pgm.createTable('albums', {
+    pgm.createTable('users', {
         id: {
-            type: 'varchar(50)',
+            type: 'varchar(36)',
             primaryKey: true,
             notNull: true,
         },
-        name: {
-            type: 'varchar(255)',
+        username: {
+            type: 'varchar(100)',
             notNull: true,
         },
-        year: {
-            type: 'int',
+        password: {
+            type: 'varchar(128)',
+            notNull: true
+        },
+        created_at: {
+            type: 'timestamp',
             notNull: true,
-        }
+        },
+        updated_at: {
+            type: 'timestamp',
+            notNull: true,
+        },
     }, {
         ifNotExists: true,
     });
@@ -29,7 +37,7 @@ export const up = (pgm) => {
  * @returns {Promise<void> | void}
  */
 export const down = (pgm) => {
-    pgm.dropTable('albums', {
+    pgm.dropTable('users', {
         ifExists: true,
     });
 };
