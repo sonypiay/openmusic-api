@@ -44,7 +44,8 @@ class Application {
                     return h.response({
                         status: "error",
                         message: "Whoops, something went wrong.",
-                    });
+                    })
+                        .code(500);
                 }
             }
 
