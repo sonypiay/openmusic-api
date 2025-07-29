@@ -14,6 +14,10 @@ export const up = (pgm) => {
             type: 'varchar(100)',
             notNull: true,
         },
+        fullname: {
+            type: 'varchar(255)',
+            notNull: true,
+        },
         password: {
             type: 'varchar(128)',
             notNull: true

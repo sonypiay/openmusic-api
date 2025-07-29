@@ -6,18 +6,14 @@
 export const up = (pgm) => {
     pgm.createTable('sessions', {
         id: {
-            type: 'varchar(50)',
+            type: 'varchar(36)',
             primaryKey: true,
         },
         user_id: {
             type: 'varchar(36)',
             notNull: true,
         },
-        access_token: {
-            type: 'text',
-            notNull: true,
-        },
-        refresh_token: {
+        token: {
             type: 'text',
             notNull: true
         },
