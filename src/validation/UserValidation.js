@@ -6,6 +6,7 @@ class UserValidation extends Validation {
         const schema = Joi.object({
             username: Joi.string().max(100).required(),
             password: Joi.string().max(100).required(),
+            fullname: Joi.string().max(100),
         }) ;
 
         return this.validate(schema, request);
