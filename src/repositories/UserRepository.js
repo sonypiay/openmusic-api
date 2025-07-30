@@ -21,7 +21,7 @@ class UserRepository {
                 uuidv4(),
                 data.username,
                 data.password,
-                data.fullname,
+                data.fullname ?? null,
                 this.createdAt,
                 this.updatedAt,
             ],
