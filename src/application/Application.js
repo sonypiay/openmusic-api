@@ -19,6 +19,14 @@ class Application {
         await this.server.register(payload);
     }
 
+    scheme(name, scheme) {
+        this.server.auth.scheme(name, scheme);
+    }
+
+    strategy(name, strategy) {
+        this.server.auth.strategy(name, strategy);
+    }
+
     async run() {
         this.server.events.on('request', (request, event, tags) => {
             if( tags.error ) {

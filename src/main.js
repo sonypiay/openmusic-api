@@ -1,7 +1,11 @@
 import Application from './application/Application.js';
 import Plugins from "./plugins/Plugins.js";
+import TokenMiddleware from "./middleware/TokenMiddleware.js";
 
 const app = new Application();
+
+app.scheme('TokenMiddleware', TokenMiddleware);
+app.strategy('token', 'TokenMiddleware');
 
 // register plugins
 await app.register(Plugins);

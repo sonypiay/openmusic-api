@@ -18,6 +18,7 @@ class PlaylistsController {
      */
     async createPlaylist(req, res) {
         const payload = this.playlistValidation.create(req.payload);
+        payload.user_id = req.auth.credentials.user_id;
         const result = await this.playlistsService.createPlaylist(payload);
 
         return res.response({
@@ -34,8 +35,8 @@ class PlaylistsController {
      * @returns {Promise<*>}
      */
     async getAllPlaylists(req, res) {
-        const { userId } = req.payload;
-        const result = await this.playlistsService.getAllPlaylist(userId);
+        const { user_id } = req.auth.credentials;
+        const result = await this.playlistsService.getAllPlaylist(user_id);
 
         return res.response({
             status: "success",
@@ -45,7 +46,7 @@ class PlaylistsController {
 
     async getPlaylistWithSongs(req, res) {
         const playlistId = req.params.id;
-        const userId = req.payload.userId;
+        const userId = req.auth.credentials.user_id;
         const result = await this.playlistsService.getPlaylistWithSongs(playlistId, userId);
 
         return res.response({
@@ -63,7 +64,7 @@ class PlaylistsController {
      */
     async deletePlaylist(req, res) {
         const playlistId = req.params.id;
-        const userId = req.payload.userId;
+        const userId = req.auth.credentials.user_id;
 
         await this.playlistsService.deletePlaylist(playlistId, userId);
 
@@ -83,7 +84,7 @@ class PlaylistsController {
     async addSongToPlaylist(req, res) {
         const payload = this.playlistSongValidation.addOrDelete(req.payload);
         payload.playlist_id = req.params.id;
-        payload.user_id = req.payload.userId;
+        payload.user_id = req.auth.credentials.user_id;
 
         await this.playlistsService.addSongToPlaylist(payload);
 
@@ -103,7 +104,7 @@ class PlaylistsController {
     async deleteSongFromPlaylist(req, res) {
         const payload = this.playlistSongValidation.addOrDelete(req.payload);
         payload.playlist_id = req.params.id;
-        payload.user_id = req.payload.userId;
+        payload.user_id = req.auth.credentials.userId;
 
         await this.playlistsService.deleteSongFromPlaylist(payload);
 
