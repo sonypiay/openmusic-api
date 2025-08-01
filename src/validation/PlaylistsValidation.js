@@ -9,6 +9,15 @@ class PlaylistsValidation extends Validation {
 
         return this.validate(schema, request);
     }
+
+    collaborator(request) {
+        const schema = Joi.object({
+            userId: Joi.string().required(),
+            playlistId: Joi.string().required(),
+        });
+
+        return this.validate(schema, request);
+    }
 }
 
 export default PlaylistsValidation;

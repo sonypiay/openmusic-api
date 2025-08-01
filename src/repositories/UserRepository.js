@@ -62,6 +62,22 @@ class UserRepository {
         const result = await this.connection.query(query);
         return result.rows.length > 0;
     }
+
+    /**
+     * Check if user exists by id
+     *
+     * @param id
+     * @returns {Promise<boolean>}
+     */
+    async existsById(id) {
+        const query = {
+            text: `SELECT id FROM users WHERE id = $1`,
+            values: [id],
+        };
+
+        const result = await this.connection.query(query);
+        return result.rows.length > 0;
+    }
 }
 
 export default UserRepository;

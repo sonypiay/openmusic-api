@@ -43,7 +43,11 @@ class PlaylistRepository {
             p.name,
             u.username
         FROM playlists AS p
-        INNER JOIN users AS u ON p.user_id = u.id WHERE u.id = $1
+        INNER JOIN users AS u ON p.user_id = u.id WHERE 
+        u.id = $1 OR
+        EXISTS (
+            SELECT 1 FROM collaborations_playlist AS cp WHERE cp.user_id = $1 AND cp.playlist_id = p.id
+        )
         ORDER BY p.name ASC`;
 
         const query = {
@@ -61,7 +65,7 @@ class PlaylistRepository {
             p.id,
             p.name,
             u.username,
-            u.id AS user_id
+            u.id AS owner_id
         FROM playlists AS p
         INNER JOIN users AS u ON p.user_id = u.id WHERE
         p.id = $1`;
@@ -73,33 +77,6 @@ class PlaylistRepository {
 
         const result = await this.connection.query(query);
         return result.rows.length > 0 ? result.rows[0] : null;
-    }
-
-    /**
-     * Get detail playlist
-     *
-     * @param id
-     * @param userId
-     * @returns {Promise<*|null>}
-     */
-    async getByIdAndUserId(id, userId) {
-        const sqlText = `
-        SELECT
-            p.id,
-            p.name,
-            u.username
-        FROM playlists AS p
-        INNER JOIN users AS u ON p.user_id = u.id WHERE
-        p.id = $1 AND
-        u.id = $2`;
-
-        const query = {
-            text: sqlText,
-            values: [id, userId]
-        };
-
-        const results = await this.connection.query(query);
-        return results.rows.length > 0 ? results.rows[0] : null;
     }
 
     /**
@@ -116,22 +93,6 @@ class PlaylistRepository {
         };
 
         await this.connection.query(query);
-    }
-
-    /**
-     * Check if playlist exists by id
-     * @param id
-     * @param userId
-     * @returns {Promise<boolean>}
-     */
-    async existsById(id) {
-        const query = {
-            text: `SELECT id FROM playlists WHERE id = $1`,
-            values: [id]
-        };
-
-        const result = await this.connection.query(query);
-        return result.rows.length > 0;
     }
 }
 

@@ -1,4 +1,5 @@
 import PlaylistsController from "../controllers/PlaylistsController.js";
+import CollaborationsPlaylistController from "../controllers/CollaborationsPlaylistController.js";
 
 export default [
     {
@@ -45,6 +46,22 @@ export default [
         path: '/playlists/{id}/songs',
         method: 'DELETE',
         handler: (request, response) => PlaylistsController.deleteSongFromPlaylist(request, response),
+        options: {
+            auth: 'token',
+        },
+    },
+    {
+        path: '/collaborations',
+        method: 'POST',
+        handler: (request, response) => CollaborationsPlaylistController.addCollaborator(request, response),
+        options: {
+            auth: 'token',
+        },
+    },
+    {
+        path: '/collaborations',
+        method: 'DELETE',
+        handler: (request, response) => CollaborationsPlaylistController.deleteCollaborator(request, response),
         options: {
             auth: 'token',
         },
