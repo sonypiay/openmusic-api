@@ -1,7 +1,7 @@
 import UnauthorizedException from "../exception/UnauthorizedException.js";
 import TokenHelper from "../helper/TokenHelper.js";
 
-const TokenMiddleware = (server, options) => {
+const TokenMiddleware = () => {
     return {
         authenticate: (request, response) => {
             const authorization = request.headers.authorization ?? '';

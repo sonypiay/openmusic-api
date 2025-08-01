@@ -1,6 +1,4 @@
-// import Jwt from '@hapi/jwt';
 import jwt from 'jsonwebtoken';
-import UnauthorizedException from "../exception/UnauthorizedException.js";
 import ResponseException from "../exception/ResponseException.js";
 import Logging from "../application/Logging.js";
 import BadRequestException from "../exception/BadRequestException.js";
