@@ -4,6 +4,7 @@ import NotFoundException from "../exception/NotFoundException.js";
 import SongsRepository from "../repositories/SongsRepository.js";
 import ForbiddenException from "../exception/ForbiddenException.js";
 import CollaborationsPlaylistRepository from "../repositories/CollaborationsPlaylistRepository.js";
+import PlaylistsActivitiesRepository from "../repositories/PlaylistsActivitiesRepository.js";
 
 class PlaylistsService {
     constructor() {
@@ -11,6 +12,7 @@ class PlaylistsService {
         this.playlistsSongRepostitory = new PlaylistsSongRepository;
         this.songsRepository = new SongsRepository;
         this.collaborationsPlaylistRepository = new CollaborationsPlaylistRepository;
+        this.playlistActivitesRepository = new PlaylistsActivitiesRepository;
     }
 
     async hasCollaborator(playlistId, userId) {
@@ -113,6 +115,12 @@ class PlaylistsService {
         }
 
         await this.playlistsSongRepostitory.create(request);
+        await this.playlistActivitesRepository.store(
+            request.playlist_id,
+            request.user_id,
+            request.songId,
+            'add'
+        );
     }
 
     /**
@@ -135,6 +143,42 @@ class PlaylistsService {
         }
 
         await this.playlistsSongRepostitory.delete(request);
+        await this.playlistActivitesRepository.store(
+            request.playlist_id,
+            request.user_id,
+            request.songId,
+            'delete'
+        );
+    }
+
+    /**
+     * Get log playlist activities
+     *
+     * @param playlistId
+     * @param userId
+     * @returns {Promise<{data: {playlistId, activities: []}}>}
+     */
+    async getActivities(playlistId, userId) {
+        const getPlaylist = await this.playlistRepository.getById(playlistId);
+
+        if( ! getPlaylist ) {
+            throw new NotFoundException("Playlist not found");
+        }
+
+        if( getPlaylist.owner_id !== userId ) {
+            if( ! await this.hasCollaborator(playlistId, userId) ) {
+                throw new ForbiddenException("You have no permission to delete song from this playlist");
+            }
+        }
+
+        const results = await this.playlistActivitesRepository.getAll(playlistId, userId);
+
+        return {
+            data: {
+                playlistId: playlistId,
+                activities: results
+            }
+        }
     }
 }
 

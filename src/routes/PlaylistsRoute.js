@@ -35,6 +35,14 @@ export default [
         },
     },
     {
+        path: '/playlists/{id}/activities',
+        method: 'GET',
+        handler: (request, response) => PlaylistsController.getActivities(request, response),
+        options: {
+            auth: 'token',
+        },
+    },
+    {
         path: '/playlists/{id}/songs',
         method: 'POST',
         handler: (request, response) => PlaylistsController.addSongToPlaylist(request, response),

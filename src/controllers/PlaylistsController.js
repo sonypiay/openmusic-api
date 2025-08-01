@@ -113,6 +113,24 @@ class PlaylistsController {
             message: "Song has been deleted from playlist",
         });
     }
+
+    /**
+     * Get log playlist activities
+     *
+     * @param req
+     * @param res
+     * @returns {Promise<*>}
+     */
+    async getActivities(req, res) {
+        const playlistId = req.params.id;
+        const userId = req.auth.credentials.user_id;
+        const result = await this.playlistsService.getActivities(playlistId, userId);
+
+        return res.response({
+            status: "success",
+            ...result,
+        });
+    }
 }
 
 export default new PlaylistsController;
