@@ -104,7 +104,7 @@ class PlaylistsController {
     async deleteSongFromPlaylist(req, res) {
         const payload = this.playlistSongValidation.addOrDelete(req.payload);
         payload.playlist_id = req.params.id;
-        payload.user_id = req.auth.credentials.userId;
+        payload.user_id = req.auth.credentials.user_id;
 
         await this.playlistsService.deleteSongFromPlaylist(payload);
 

@@ -55,6 +55,26 @@ class PlaylistRepository {
         return result.rows;
     }
 
+    async getById(id) {
+        const sqlText = `
+        SELECT
+            p.id,
+            p.name,
+            u.username,
+            u.id AS user_id
+        FROM playlists AS p
+        INNER JOIN users AS u ON p.user_id = u.id WHERE
+        p.id = $1`;
+
+        const query = {
+            text: sqlText,
+            values: [id]
+        };
+
+        const result = await this.connection.query(query);
+        return result.rows.length > 0 ? result.rows[0] : null;
+    }
+
     /**
      * Get detail playlist
      *
@@ -62,7 +82,7 @@ class PlaylistRepository {
      * @param userId
      * @returns {Promise<*|null>}
      */
-    async getById(id, userId) {
+    async getByIdAndUserId(id, userId) {
         const sqlText = `
         SELECT
             p.id,
@@ -89,11 +109,10 @@ class PlaylistRepository {
      * @param userId
      * @returns {Promise<void>}
      */
-    async delete(id, userId) {
-        const sqlText = `DELETE FROM playlists WHERE id = $1 AND user_id = $2`;
+    async delete(id) {
         const query = {
-            text: sqlText,
-            values: [id, userId]
+            text: `DELETE FROM playlists WHERE id = $1`,
+            values: [id]
         };
 
         await this.connection.query(query);
@@ -105,10 +124,10 @@ class PlaylistRepository {
      * @param userId
      * @returns {Promise<boolean>}
      */
-    async existsById(id, userId) {
-        const sqlText = `SELECT id FROM playlists WHERE id = $1 AND user_id = $2`;
+    async existsById(id) {
         const query = {
-            text: sqlText,
+            text: `SELECT id FROM playlists WHERE id = $1`,
+            values: [id]
         };
 
         const result = await this.connection.query(query);

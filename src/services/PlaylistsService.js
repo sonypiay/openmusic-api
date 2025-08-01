@@ -1,11 +1,14 @@
 import PlaylistRepository from "../repositories/PlaylistRepository.js";
 import PlaylistsSongRepository from "../repositories/PlaylistsSongRepository.js";
 import NotFoundException from "../exception/NotFoundException.js";
+import SongsRepository from "../repositories/SongsRepository.js";
+import ForbiddenException from "../exception/ForbiddenException.js";
 
 class PlaylistsService {
     constructor() {
         this.playlistRepository = new PlaylistRepository;
         this.playlistsSongRepostitory = new PlaylistsSongRepository;
+        this.songsRepository = new SongsRepository;
     }
 
     /**
@@ -47,7 +50,9 @@ class PlaylistsService {
      */
     async getPlaylistWithSongs(playlistId, userId) {
         const resultPlaylist = await this.playlistRepository.getById(playlistId, userId);
+
         if( ! resultPlaylist ) throw new NotFoundException("Playlist not found");
+        if( resultPlaylist.user_id !== userId ) throw new ForbiddenException("You have no permission to access this playlist");
 
         resultPlaylist.songs = await this.playlistsSongRepostitory.getByPlaylistId(playlistId);
 
@@ -66,8 +71,10 @@ class PlaylistsService {
      * @returns {Promise<void>}
      */
     async deletePlaylist(playlistId, userId) {
-        const resultPlaylist = await this.playlistRepository.getById(playlistId, userId);
+        const resultPlaylist = await this.playlistRepository.getById(playlistId);
+
         if( ! resultPlaylist ) throw new NotFoundException("Playlist not found");
+        if( resultPlaylist.user_id !== userId ) throw new ForbiddenException("You have no permission to delete this playlist");
 
         await this.playlistRepository.delete(playlistId, userId);
     }
@@ -79,8 +86,12 @@ class PlaylistsService {
      * @returns {Promise<void>}
      */
     async addSongToPlaylist(request) {
-        if( ! await this.playlistRepository.existsById(request.playlist_id, request.user_id) )
-            throw new NotFoundException("Playlist not found");
+        if( ! await this.songsRepository.existsById(request.songId) ) throw new NotFoundException("Song not found");
+
+        const getPlaylist = await this.playlistRepository.getById(request.playlist_id);
+        if( ! getPlaylist ) throw new NotFoundException("Playlist not found");
+
+        if( getPlaylist.user_id !== request.user_id ) throw new ForbiddenException("You have no permission to add song to this playlist");
 
         await this.playlistsSongRepostitory.create(request);
     }
@@ -92,8 +103,15 @@ class PlaylistsService {
      * @returns {Promise<void>}
      */
     async deleteSongFromPlaylist(request) {
-        if( ! await this.playlistRepository.existsById(request.playlist_id, request.user_id) )
+        const getPlaylist = await this.playlistRepository.getById(request.playlist_id);
+
+        if( ! getPlaylist ) {
             throw new NotFoundException("Playlist not found");
+        }
+
+        if( getPlaylist.user_id !== request.user_id ) {
+            throw new ForbiddenException("You have no permission to delete song from this playlist");
+        }
 
         await this.playlistsSongRepostitory.delete(request);
     }

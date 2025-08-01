@@ -30,6 +30,7 @@ class Application {
     async run() {
         this.server.events.on('request', (request, event, tags) => {
             if( tags.error ) {
+                Logging.error(`An error has occured on path ${request.path}`);
                 Logging.error(event.error.message);
             }
         });
@@ -48,6 +49,7 @@ class Application {
             if( response.isBoom ) {
                 if( response.output.statusCode === 500 ) {
                     Logging.error(response.message);
+                    Logging.error(response.stack);
 
                     return h.response({
                         status: "error",
