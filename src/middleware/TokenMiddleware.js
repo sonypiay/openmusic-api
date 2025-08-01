@@ -1,9 +1,10 @@
 import UnauthorizedException from "../exception/UnauthorizedException.js";
 import TokenHelper from "../helper/TokenHelper.js";
+import UserRepository from "../repositories/UserRepository.js";
 
 const TokenMiddleware = () => {
     return {
-        authenticate: (request, response) => {
+        authenticate: async (request, response) => {
             const authorization = request.headers.authorization ?? '';
 
             if( authorization === '' ) {
@@ -14,10 +15,16 @@ const TokenMiddleware = () => {
             const tokenHelper = new TokenHelper;
 
             try {
-                const users = tokenHelper.verifyToken(token, 'access');
+                const userToken = tokenHelper.verifyToken(token, 'access');
+                const userRepository = new UserRepository;
+                const users = await userRepository.getById(userToken.user_id);
 
                 return response.authenticated({
-                    credentials: users
+                    credentials: {
+                        user_id: users.id,
+                        username: users.username,
+                        fullname: users.fullname,
+                    },
                 });
             } catch (error) {
                 throw new UnauthorizedException(error.message);

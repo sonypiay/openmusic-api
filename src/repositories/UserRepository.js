@@ -78,6 +78,22 @@ class UserRepository {
         const result = await this.connection.query(query);
         return result.rows.length > 0;
     }
+
+    /**
+     * Get user by id
+     *
+     * @param id
+     * @returns {Promise<*|null>}
+     */
+    async getById(id) {
+        const query = {
+            text: `SELECT id, username, fullname FROM users WHERE id = $1`,
+            values: [id],
+        };
+
+        const result = await this.connection.query(query);
+        return result.rows.length > 0 ? result.rows[0] : null;
+    }
 }
 
 export default UserRepository;
