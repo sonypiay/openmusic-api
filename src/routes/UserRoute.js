@@ -1,6 +1,6 @@
 import UserController from "../controllers/UserController.js";
 
-export const UserRoute = [
+export default [
     {
         path: '/users',
         method: 'POST',

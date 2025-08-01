@@ -1,6 +1,6 @@
 import SongsController from "../controllers/SongsController.js";
 
-export const SongsRoute = [
+export default [
     {
         path: '/songs',
         method: 'GET',

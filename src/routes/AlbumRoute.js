@@ -1,6 +1,6 @@
 import AlbumController from "../controllers/AlbumController.js";
 
-export const AlbumRoute = [
+export default [
     {
         method: 'GET',
         path: '/albums/{id}',

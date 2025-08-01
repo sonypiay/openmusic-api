@@ -1,6 +1,6 @@
 import AuthenticationController from "../controllers/AuthenticationController.js";
 
-export const AuthRoute = [
+export default [
     {
         path: '/authentications',
         method: 'POST',
