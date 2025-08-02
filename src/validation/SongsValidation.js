@@ -8,6 +8,8 @@ class SongsValidation extends Validation {
             year: Joi.number().required(),
             genre: Joi.string().max(255).required(),
             performer: Joi.string().max(255).required(),
+            duration: Joi.number().optional(),
+            albumId: Joi.string().optional(),
         });
 
         return this.validate(schema, request);
