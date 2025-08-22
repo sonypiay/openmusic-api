@@ -5,6 +5,8 @@ import SongsRepository from "../repositories/SongsRepository.js";
 import ForbiddenException from "../exception/ForbiddenException.js";
 import CollaborationsPlaylistRepository from "../repositories/CollaborationsPlaylistRepository.js";
 import PlaylistsActivitiesRepository from "../repositories/PlaylistsActivitiesRepository.js";
+import ProducerService from "./ProducerService.js";
+import { writeFileSync, mkdirSync, existsSync } from "fs";
 
 class PlaylistsService {
     constructor() {
@@ -13,6 +15,7 @@ class PlaylistsService {
         this.songsRepository = new SongsRepository;
         this.collaborationsPlaylistRepository = new CollaborationsPlaylistRepository;
         this.playlistActivitesRepository = new PlaylistsActivitiesRepository;
+        this.producerService = new ProducerService;
     }
 
     async hasCollaborator(playlistId, userId) {
@@ -60,7 +63,7 @@ class PlaylistsService {
      * @returns {Promise<{data: {playlist: *}}>}
      */
     async getPlaylistWithSongs(playlistId, userId) {
-        const resultPlaylist = await this.playlistRepository.getById(playlistId, userId);
+        const resultPlaylist = await this.playlistRepository.getById(playlistId);
 
         if( ! resultPlaylist ) throw new NotFoundException("Playlist not found");
 
@@ -92,7 +95,7 @@ class PlaylistsService {
         if( ! resultPlaylist ) throw new NotFoundException("Playlist not found");
         if( resultPlaylist.owner_id !== userId ) throw new ForbiddenException("You have no permission to delete this playlist");
 
-        await this.playlistRepository.delete(playlistId, userId);
+        await this.playlistRepository.delete(playlistId);
     }
 
     /**
@@ -178,7 +181,52 @@ class PlaylistsService {
                 playlistId: playlistId,
                 activities: results
             }
+        };
+    }
+
+    /**
+     * Export playlist
+     *
+     * @param targetEmail
+     * @param playlistId
+     * @param userId
+     * @returns {Promise<{playlist: *}>}
+     */
+    async exportPlaylist(targetEmail, playlistId, userId) {
+        const getPlaylist = await this.playlistRepository.getById(playlistId);
+
+        if( ! getPlaylist ) {
+            throw new NotFoundException("Playlist not found");
         }
+
+        if( getPlaylist.owner_id !== userId ) {
+            throw new ForbiddenException("You have no permission to export this playlist");
+        }
+
+        const resultPlaylist = {
+            playlist: {
+                id: getPlaylist.id,
+                name: getPlaylist.name,
+                songs: await this.playlistsSongRepostitory.getByPlaylistId(playlistId),
+            },
+        };
+
+        const pathName = "export";
+        const filename = "playlist_" + getPlaylist.id + ".json";
+        const pathFile = `${pathName}/${filename}`;
+        const message = JSON.stringify({
+            file: pathFile,
+            email: targetEmail,
+        });
+
+        if( ! existsSync(pathName) ) {
+            mkdirSync(pathName);
+        }
+
+        writeFileSync(pathFile, JSON.stringify(resultPlaylist));
+
+        this.producerService.setMessage(message);
+        await this.producerService.send("export");
     }
 }
 

@@ -18,6 +18,14 @@ class PlaylistsValidation extends Validation {
 
         return this.validate(schema, request);
     }
+
+    export(request) {
+        const schema = Joi.object({
+            targetEmail: Joi.string().email().required(),
+        });
+
+        return this.validate(schema, request);
+    }
 }
 
 export default PlaylistsValidation;

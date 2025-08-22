@@ -74,4 +74,12 @@ export default [
             auth: 'token',
         },
     },
+    {
+        path: '/export/playlists/{id}',
+        method: 'POST',
+        handler: (request, response) => PlaylistsController.exportPlaylist(request, response),
+        options: {
+            auth: 'token',
+        },
+    },
 ];

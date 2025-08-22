@@ -131,6 +131,26 @@ class PlaylistsController {
             ...result,
         });
     }
+
+    /**
+     * Export playlist
+     *
+     * @param req
+     * @param res
+     * @returns {Promise<*>}
+     */
+    async exportPlaylist(req, res) {
+        const playlistId = req.params.id;
+        const payload = this.playlistValidation.export(req.payload);
+        const email = payload.targetEmail;
+        const userId = req.auth.credentials.user_id;
+        await this.playlistsService.exportPlaylist(email, playlistId, userId);
+
+        return res.response({
+            status: "success",
+            message: "Playlist has been exported",
+        }).code(201);
+    }
 }
 
 export default new PlaylistsController;
