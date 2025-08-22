@@ -215,7 +215,7 @@ class PlaylistsService {
         const filename = "playlist_" + getPlaylist.id + ".json";
         const pathFile = `${pathName}/${filename}`;
         const message = JSON.stringify({
-            file: pathFile,
+            file: filename,
             email: targetEmail,
         });
 
