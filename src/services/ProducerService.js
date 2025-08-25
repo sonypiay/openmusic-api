@@ -1,12 +1,30 @@
-import QueueConnection from "../application/QueueConnection.js";
+import amqp from "amqplib";
 
 class ProducerService {
     queue = null;
     message = null;
     channel = null;
 
-    constructor() {
-        this.queueConnection = new QueueConnection;
+    async createConnection() {
+        this.client = await amqp.connect(process.env.RABBITMQ_SERVER);
+    }
+
+    async createChannel() {
+        if (!this.client) {
+            await this.createConnection();
+        }
+
+        this.channel = await this.client.createChannel();
+    }
+
+    async closeConnection() {
+        if (this.channel) {
+            await this.channel.close();
+        }
+
+        if (this.client) {
+            await this.client.close();
+        }
     }
 
     async setQueue(queue) {
@@ -33,13 +51,17 @@ class ProducerService {
     }
 
     async send(queue) {
-        this.channel = await this.queueConnection.createChannel();
+        await this.createChannel();
 
         if( queue ) {
             await this.setQueue(queue);
         }
 
         await this.channel.sendToQueue(this.getQueue(), Buffer.from(this.getMessage()));
+
+        setTimeout(async () => {
+            await this.closeConnection();
+        }, 5000);
     }
 }
 

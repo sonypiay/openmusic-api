@@ -217,6 +217,7 @@ class PlaylistsService {
         const message = JSON.stringify({
             file: filename,
             email: targetEmail,
+            name: getPlaylist.name,
         });
 
         if( ! existsSync(pathName) ) {
@@ -226,7 +227,7 @@ class PlaylistsService {
         writeFileSync(pathFile, JSON.stringify(resultPlaylist));
 
         this.producerService.setMessage(message);
-        await this.producerService.send("export");
+        await this.producerService.send("email");
     }
 }
 
