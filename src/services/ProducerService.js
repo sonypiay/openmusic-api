@@ -1,12 +1,22 @@
 import amqp from "amqplib";
 
 class ProducerService {
-    queue = null;
-    message = null;
-    channel = null;
+    constructor() {
+        this.client = null;
+        this.queue = null;
+        this.channel = null;
+        this.options = {
+            durable: true,
+            arguments: {
+                'x-queue-type': 'quorum',
+            },
+        };
+    }
 
     async createConnection() {
-        this.client = await amqp.connect(process.env.RABBITMQ_SERVER);
+        if( ! this.client ) {
+            this.client = await amqp.connect(process.env.RABBITMQ_SERVER);
+        }
     }
 
     async createChannel() {
@@ -14,7 +24,9 @@ class ProducerService {
             await this.createConnection();
         }
 
-        this.channel = await this.client.createChannel();
+        if( ! this.channel ) {
+            this.channel = await this.client.createChannel();
+        }
     }
 
     async closeConnection() {
@@ -30,38 +42,63 @@ class ProducerService {
     async setQueue(queue) {
         this.queue = queue;
 
-        await this.channel.assertQueue(this.queue, {
-            durable: true,
-            arguments: {
-                'x-queue-type': 'quorum',
-            }
-        });
+        await this.channel.assertQueue(this.queue, this.getQueueOptions());
     }
 
     getQueue() {
         return this.queue;
     }
 
-    setMessage(message) {
+    setQueueOptions(options) {
+        if( options ) {
+            this.options = options;
+        }
+    }
+
+    getQueueOptions() {
+        return this.options;
+    }
+
+    setMessage(message, headers = {}) {
         this.message = message;
+
+        if( headers ) {
+            this.setHeaders(headers);
+        }
     }
 
     getMessage() {
         return this.message;
     }
 
-    async send(queue) {
-        await this.createChannel();
+    setHeaders(headers) {
+        if( headers ) {
+            this.headers = headers;
+        }
+    }
 
-        if( queue ) {
-            await this.setQueue(queue);
+    getHeaders() {
+        return this.headers ?? {};
+    }
+
+    async send(queue) {
+        if( ! this.channel ) {
+            await this.createChannel();
         }
 
-        await this.channel.sendToQueue(this.getQueue(), Buffer.from(this.getMessage()));
+        if( queue ) {
+            await this.setQueue(queue, this.getQueueOptions());
+        }
 
-        setTimeout(async () => {
-            await this.closeConnection();
-        }, 5000);
+        await this.channel.sendToQueue(
+            this.getQueue(),
+            Buffer.from(this.getMessage()),
+            {
+                headers: this.getHeaders(),
+            }
+        );
+
+        await this.closeConnection();
     }
 }
 

@@ -1,10 +1,14 @@
 import nodemailer from 'nodemailer';
+import sanitizeHtml from 'sanitize-html';
 import Logging from "../application/Logging.js";
 
 class Mailer {
-    email = [];
-    subject = '';
-    content = '';
+    constructor() {
+        this.email = [];
+        this.subject = '';
+        this.content = '';
+        this.attachments = [];
+    }
 
     createTransport() {
         const config = {
@@ -42,22 +46,36 @@ class Mailer {
         this.content = content;
     }
 
-    getContent() {
-        return this.content;
+    getContent(isSanitized = true) {
+        return isSanitized
+            ? sanitizeHtml(this.content, {
+                allowedTags: [],
+                allowedAttributes: {},
+            })
+            : this.content;
     }
 
-    async send(attachments = []) {
+    setAttachments(attachments) {
+        this.attachments.push(attachments);
+    }
+
+    getAttachments() {
+        return this.attachments;
+    }
+
+    async send() {
         const transport = this.createTransport();
 
         const data = {
             from: process.env.SMTP_FROM,
             to: this.getRecipient(),
             subject: this.getSubject(),
-            text: this.getContent(),
+            text: this.getContent(true),
+            html: this.getContent(false),
         };
 
-        if( attachments && attachments.length > 0 ) {
-            data.attachments = attachments;
+        if( this.getAttachments().length > 0 ) {
+            data.attachments = this.getAttachments();
         }
 
         const info = await transport.sendMail(data);

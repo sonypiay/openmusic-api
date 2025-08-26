@@ -1,11 +1,22 @@
-import Logging from "../application/Logging.js";
 import amqp from "amqplib";
 
 class ConsumerService {
-    channel = null;
+    constructor() {
+        this.client = null;
+        this.queue = null;
+        this.channel = null;
+        this.options = {
+            durable: true,
+            arguments: {
+                'x-queue-type': 'quorum',
+            },
+        };
+    }
 
     async createConnection() {
-        this.client = await amqp.connect(process.env.RABBITMQ_SERVER);
+        if( ! this.client ) {
+            this.client = await amqp.connect(process.env.RABBITMQ_SERVER);
+        }
     }
 
     async createChannel() {
@@ -13,22 +24,28 @@ class ConsumerService {
             await this.createConnection();
         }
 
-        this.channel = await this.client.createChannel();
+        if( ! this.channel ) {
+            this.channel = await this.client.createChannel();
+        }
     }
 
     async setQueue(queue) {
         this.queue = queue;
-
-        await this.channel.assertQueue(this.queue, {
-            durable: true,
-            arguments: {
-                'x-queue-type': 'quorum',
-            },
-        });
+        await this.channel.assertQueue(this.queue, this.getQueueOptions());
     }
 
     getQueue() {
         return this.queue;
+    }
+
+    setQueueOptions(options) {
+        if( options ) {
+            this.options = options;
+        }
+    }
+
+    getQueueOptions() {
+        return this.options;
     }
 
     async listen(queue, callback) {
