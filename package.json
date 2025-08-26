@@ -11,7 +11,8 @@
     "start": "dotenv -- node ./src/main.js",
     "migrate": "dotenv -- node-pg-migrate",
     "lint": "eslint src/**/*.js",
-    "listeners:email": "dotenv -- node ./src/listeners/EmailListener.js"
+    "listener": "dotenv -- node ./src/listeners/Listener.js",
+    "listener:email": "npm run listener -- --filename=EmailListener --max-retry=3 --retry-delay=2000"
   },
   "dependencies": {
     "@hapi/hapi": "^21.4.0",
