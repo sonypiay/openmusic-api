@@ -19,7 +19,7 @@ if( ! existsSync(`./src/listeners/${filename}`) ) {
     process.exit(1);
 }
 
-const module = await import("./EmailListener.js");
+const module = await import(`./${filename}`);
 const className = new module.default;
 className.maxRetry = maxRetry;
 className.retryDelay = retryDelay;
