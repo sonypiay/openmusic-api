@@ -10,7 +10,8 @@
     "dev": "dotenv -- nodemon ./src/main.js",
     "start": "dotenv -- node ./src/main.js",
     "migrate": "dotenv -- node-pg-migrate",
-    "lint": "eslint src/**/*.js"
+    "lint": "eslint src/**/*.js",
+    "listeners:email": "dotenv -- node ./src/listeners/EmailListener.js"
   },
   "dependencies": {
     "@hapi/hapi": "^21.4.0",

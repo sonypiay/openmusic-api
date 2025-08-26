@@ -1,11 +1,9 @@
-import dotenv from "dotenv";
-dotenv.config();
-
-import { existsSync, createReadStream } from "fs";
+import { existsSync, createReadStream, unlinkSync } from "node:fs";
 
 import ConsumerService from "../services/ConsumerService.js";
 import Mailer from "../helper/Mailer.js";
 import ProducerService from "../services/ProducerService.js";
+import Logging from "../application/Logging.js";
 
 const queue = "email";
 const consumerService = new ConsumerService();
@@ -19,7 +17,10 @@ const init = async() => {
             const data = JSON.parse(message.content.toString());
             let retryCount = headers['x-retry-count'] ?? 0;
 
-            console.info(`Received message: ${JSON.stringify(data)}`);
+            if( ! existsSync(`./export/${data.file}`) ) {
+                Logging.error(`File ${data.file} not found!`);
+                return;
+            }
 
             try {
                 const mailer = new Mailer();
@@ -34,29 +35,28 @@ const init = async() => {
                 });
 
                 await mailer.send();
+                unlinkSync(`./export/${data.file}`);
             } catch (error) {
                 console.error(`There was an error while sending email: ${error.message}`);
+                const producerService = new ProducerService();
 
                 if( retryCount < 3 ) {
                     console.info(`Retrying to send email to ${data.email}`);
                     setTimeout(async() => {
-                        const producerService = new ProducerService();
                         producerService.setMessage(JSON.stringify(data), {
                             'x-retry-count': retryCount
                         });
                         await producerService.send(queue);
-                    }, 5000);
+                    }, 2000);
 
                     retryCount++;
                 } else {
                     console.error(`Failed to send email to ${data.email} after 3 retries`);
-                    const producerService = new ProducerService();
                     producerService.setQueueOptions({
                         durable: true,
                         arguments: {
-                            'x-message-ttl': 60 * 1000,
-                            'x-queue-type': 'quorum'
-                        }
+                            'x-queue-type': 'quorum',
+                        },
                     });
                     producerService.setMessage(JSON.stringify(data), {
                         'x-queue-from': queue,
@@ -66,7 +66,7 @@ const init = async() => {
             }
         });
     } catch(error) {
-        console.error(`Failed to start email listener`);
+        console.error(`Failed to start email listener: ${error.message}`);
         console.info(`Retrying in 5 seconds...`);
         setTimeout(await init, 5000);
     }
