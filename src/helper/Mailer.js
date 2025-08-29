@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
 import sanitizeHtml from 'sanitize-html';
 import Logging from "../application/Logging.js";
+import Configuration from "../application/Configuration.js";
 
 class Mailer {
     constructor() {
@@ -12,15 +13,16 @@ class Mailer {
 
     createTransport() {
         const config = {
-            host: process.env.SMTP_HOST,
-            port: process.env.SMTP_PORT,
+            host: Configuration.smtp.host,
+            port: Configuration.smtp.port,
+            secure: Configuration.smtp.secure,
         };
 
-        if( process.env.SMTP_USER && process.env.SMTP_PASSWORD ) {
+        if( Configuration.smtp.user && Configuration.smtp.password ) {
             config.auth = {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASSWORD,
-            }
+                user: Configuration.smtp.user,
+                pass: Configuration.smtp.password,
+            };
         }
 
         return nodemailer.createTransport(config);
@@ -67,7 +69,7 @@ class Mailer {
         const transport = this.createTransport();
 
         const data = {
-            from: process.env.SMTP_FROM,
+            from: Configuration.smtp.from,
             to: this.getRecipient(),
             subject: this.getSubject(),
             text: this.getContent(true),

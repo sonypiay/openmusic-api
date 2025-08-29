@@ -1,4 +1,4 @@
-import amqp from "amqplib";
+import RabbitMQConnection from "../application/RabbitMQConnection.js";
 
 class ConsumerService {
     constructor() {
@@ -13,19 +13,13 @@ class ConsumerService {
         };
     }
 
-    async createConnection() {
-        if( ! this.client ) {
-            this.client = await amqp.connect(process.env.RABBITMQ_SERVER);
-        }
-    }
-
     async createChannel() {
-        if (!this.client) {
-            await this.createConnection();
+        if ( ! this.client ) {
+            this.client = await RabbitMQConnection.connection();
         }
 
         if( ! this.channel ) {
-            this.channel = await this.client.createChannel();
+            this.channel = await this.client.createChannel(this.client);
         }
     }
 

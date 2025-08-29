@@ -1,4 +1,4 @@
-import amqp from "amqplib";
+import RabbitMQConnection from "../application/RabbitMQConnection.js";
 
 class ProducerService {
     constructor() {
@@ -13,29 +13,23 @@ class ProducerService {
         };
     }
 
-    async createConnection() {
-        if( ! this.client ) {
-            this.client = await amqp.connect(process.env.RABBITMQ_SERVER);
-        }
-    }
-
     async createChannel() {
-        if (!this.client) {
-            await this.createConnection();
+        if( ! this.client ) {
+            this.client = await RabbitMQConnection.connection();
         }
 
         if( ! this.channel ) {
-            this.channel = await this.client.createChannel();
+            this.channel = await RabbitMQConnection.createChannel(this.client);
         }
     }
 
-    async closeConnection() {
+    async close() {
         if (this.channel) {
-            await this.channel.close();
+            await RabbitMQConnection.close(this.channel);
         }
 
         if (this.client) {
-            await this.client.close();
+            await RabbitMQConnection.close(this.client);
         }
     }
 
@@ -82,9 +76,8 @@ class ProducerService {
     }
 
     async send(queue) {
-        if( ! this.channel ) {
-            await this.createChannel();
-        }
+        await this.createChannel();
+        console.info(`Connected to queue ${this.getQueue()}`);
 
         if( queue ) {
             await this.setQueue(queue, this.getQueueOptions());
@@ -98,7 +91,7 @@ class ProducerService {
             }
         );
 
-        await this.closeConnection();
+        await this.close();
     }
 }
 

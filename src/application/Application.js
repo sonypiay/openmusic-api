@@ -1,12 +1,13 @@
 import hapi from '@hapi/hapi';
 import Logging from "./Logging.js";
 import ResponseException from "../exception/ResponseException.js";
+import Configuration from "./Configuration.js";
 
 class Application {
     constructor() {
         this.server = hapi.server({
-            port: process.env.PORT,
-            host: process.env.HOST,
+            port: Configuration.application.port,
+            host: Configuration.application.host,
             routes: {
                 cors: {
                     origin: ['*'],

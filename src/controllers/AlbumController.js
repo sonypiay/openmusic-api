@@ -76,6 +76,25 @@ class AlbumController {
             message: "Album has been deleted",
         });
     }
+
+    /**
+     * Upload cover album
+     *
+     * @param req
+     * @param res
+     * @returns {Promise<void>}
+     */
+    async uploadCover(req, res) {
+        const id = req.params.id;
+        const uploadCover = req.payload.cover;
+
+        await this.albumService.uploadCover(id, uploadCover);
+
+        return res.response({
+            status: "success",
+            message: "Cover has been uploaded",
+        }).code(201);
+    }
 }
 
 export default new AlbumController;

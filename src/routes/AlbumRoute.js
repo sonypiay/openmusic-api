@@ -20,5 +20,18 @@ export default [
         method: 'DELETE',
         path: '/albums/{id}',
         handler: (request, response) => AlbumController.delete(request, response),
-    }
+    },
+    {
+        method: 'POST',
+        path: '/albums/{id}/covers',
+        handler: (request, response) => AlbumController.uploadCover(request, response),
+        options: {
+            payload: {
+                output: 'stream',
+                parse: true,
+                multipart: true,
+                // maxBytes: 10485760,
+            },
+        },
+    },
 ]

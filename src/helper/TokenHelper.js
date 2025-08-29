@@ -1,17 +1,17 @@
 import jwt from 'jsonwebtoken';
-import ResponseException from "../exception/ResponseException.js";
 import Logging from "../application/Logging.js";
 import BadRequestException from "../exception/BadRequestException.js";
+import Configuration from "../application/Configuration.js";
 
 class TokenHelper {
     payload = undefined;
 
     constructor() {
-        this.algorithm = process.env.JWT_ALGORITHM ?? 'HS256';
+        this.algorithm = Configuration.jwt.algorithm;
     }
 
     generateToken(key, expiry) {
-        if( ! this.getPayload() ) throw new ResponseException(400, 'fail', 'Payload is required');
+        if( ! this.getPayload() ) throw new BadRequestException('Payload is required');
 
         return jwt.sign(this.getPayload(), key, {
             algorithm: this.algorithm,
@@ -29,15 +29,15 @@ class TokenHelper {
 
     getAccessToken() {
         return this.generateToken(
-            process.env.JWT_ACCESS_TOKEN_KEY,
-            process.env.JWT_ACCESS_TOKEN_AGE
+            Configuration.jwt.accessToken.key,
+            Configuration.jwt.accessToken.expiresIn,
         );
     }
 
     getRefreshToken() {
         return this.generateToken(
-            process.env.JWT_REFRESH_TOKEN_KEY,
-            process.env.JWT_REFRESH_TOKEN_AGE
+            Configuration.jwt.refreshToken.key,
+            Configuration.jwt.refreshToken.expiresIn,
         );
     }
 
@@ -49,8 +49,8 @@ class TokenHelper {
         if( ! token ) throw new BadRequestException("Token is required");
 
         const key = type === 'access'
-            ? process.env.JWT_ACCESS_TOKEN_KEY
-            : process.env.JWT_REFRESH_TOKEN_KEY;
+            ? Configuration.jwt.accessToken.key
+            : Configuration.jwt.refreshToken.key;
 
         try {
             jwt.verify(token, key);

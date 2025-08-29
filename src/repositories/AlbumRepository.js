@@ -35,7 +35,7 @@ class AlbumRepository {
      */
     async getById(id) {
         const query = {
-            text: `SELECT * FROM albums WHERE id = $1`,
+            text: `SELECT id, name, year, cover, created_at, updated_at FROM albums WHERE id = $1`,
             values: [id],
         };
 
@@ -44,14 +44,27 @@ class AlbumRepository {
             values: [id]
         };
 
-        const result = await this.connection.query(query);
+        const resultAlbum = await this.connection.query(query);
 
-        if( ! result.rows.length ) return null;
+        if( ! resultAlbum.rows.length ) return null;
+
+        const result = {
+            id: resultAlbum.rows[0].id,
+            name: resultAlbum.rows[0].name,
+            year: resultAlbum.rows[0].year,
+            coverUrl: resultAlbum.rows[0].cover,
+            createdAt: resultAlbum.rows[0].created_at,
+            updatedAt: resultAlbum.rows[0].updated_at,
+            songs: [],
+        };
 
         const resultSongs = await this.connection.query(querySongs);
 
-        result.rows[0].songs = resultSongs.rows.length > 0 ? resultSongs.rows : [];
-        return result.rows[0];
+        if( resultSongs.rows.length > 0 ) {
+            result.songs = resultSongs.rows;
+        }
+
+        return result;
     }
 
     /**
@@ -99,6 +112,22 @@ class AlbumRepository {
 
         const result = await this.connection.query(query);
         return result.rows.length > 0;
+    }
+
+    /**
+     * Update album cover
+     *
+     * @param id
+     * @param coverUrl
+     * @returns {Promise<void>}
+     */
+    async updateCover(id, coverUrl) {
+        const query = {
+            text: `UPDATE albums SET cover = $1 WHERE id = $2`,
+            values: [coverUrl, id],
+        };
+
+        await this.connection.query(query);
     }
 }
 
