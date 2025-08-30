@@ -5,7 +5,6 @@ import StorageHelper from "../helper/StorageHelper.js";
 import SongsRepository from "../repositories/SongsRepository.js";
 import NotFoundException from "../exception/NotFoundException.js";
 import StorageService from "./StorageService.js";
-import * as fs from "node:fs";
 
 class AlbumService {
     constructor() {

@@ -5,15 +5,13 @@ import ProducerService from "../services/ProducerService.js";
 import Logging from "../application/Logging.js";
 
 class EmailListener {
-    constructor(retryDelay, maxRetry) {
+    constructor() {
         this.consumerService = new ConsumerService();
         this.mailer = new Mailer();
         this.deadQueue = 'dlq';
         this.retryCount = 0;
 
         this.setQueue('email');
-        this.setRetryDelay(retryDelay ?? 2000);
-        this.setMaxRetry(maxRetry ?? 3);
     }
 
     setQueue(queue) {

@@ -1,27 +1,50 @@
 import { existsSync } from "node:fs";
 
-const args = process.argv.slice(2);
-const filenameArgs = args.find(arg => arg.startsWith('--filename='));
-const maxRetryArgs = args.find(arg => arg.startsWith('--max-retry='));
-const retryDelayArgs = args.find(arg => arg.startsWith('--retry-delay='));
+class Listener {
+    constructor(args) {
+        this.args = args;
+        this.path = `./src/listeners`;
+    }
 
-if( ! filenameArgs ) {
-    console.error('Invalid arguments, use --filename=');
-    process.exit(1);
+    getFilename() {
+        const classArgs = this.args.find(arg => arg.startsWith('--class='));
+
+        console.log(this.args);
+
+        if( ! classArgs ) {
+            console.error('Invalid arguments, use --class=');
+            process.exit(1);
+        }
+
+        const filename = `./${classArgs.split('=')[1]}.js`;
+
+        if( ! existsSync(`${this.path}/${filename}`) ) {
+            console.error(`File ${filename} not found`);
+            process.exit(1);
+        }
+
+        return filename;
+    }
+
+    getMaxRetry() {
+        const maxRetryArgs = this.args.find(arg => arg.startsWith('--max-retry='));
+        return maxRetryArgs ? parseInt(maxRetryArgs.split('=')[1]) : 3;
+    }
+
+    getRetryDelay() {
+        const retryDelayArgs = this.args.find(arg => arg.startsWith('--retry-delay='));
+        return retryDelayArgs ? parseInt(retryDelayArgs.split('=')[1]) : 5000;
+    }
+
+    async run() {
+        const module = await import(`./${this.getFilename()}`);
+        const className = new module.default;
+
+        className.setMaxRetry(this.getMaxRetry());
+        className.setRetryDelay(this.getRetryDelay());
+        className.handle();
+    }
 }
 
-const filename = `./${filenameArgs.split('=')[1]}.js`;
-const maxRetry = maxRetryArgs ? parseInt(maxRetryArgs.split('=')[1]) : 3;
-const retryDelay = retryDelayArgs ? parseInt(retryDelayArgs.split('=')[1]) : 1000;
-
-if( ! existsSync(`./src/listeners/${filename}`) ) {
-    console.error(`File ${filename} not found`);
-    process.exit(1);
-}
-
-const module = await import(`./${filename}`);
-const className = new module.default;
-className.maxRetry = maxRetry;
-className.retryDelay = retryDelay;
-
-await className.handle();
+const listener = new Listener(process.argv.slice(2));
+await listener.run();
