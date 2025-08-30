@@ -13,6 +13,8 @@ export default {
         from: process.env.SMTP_FROM,
     },
     rabbitmq: {
+        username: process.env.RABBITMQ_USER ?? 'guest',
+        password: process.env.RABBITMQ_PASSWORD ?? 'guest',
         host: process.env.RABBITMQ_HOST ?? 'localhost',
         timeout: process.env.RABBITMQ_TIMEOUT ?? 5000,
         port: process.env.RABBITMQ_PORT ?? 5672,
