@@ -1,12 +1,16 @@
 import { v4 as uuidv4 } from 'uuid';
 import AlbumRepository from "../repositories/AlbumRepository.js";
 import ResponseException from "../exception/ResponseException.js";
-import FileUpload from "../helper/FileUpload.js";
 import StorageHelper from "../helper/StorageHelper.js";
+import SongsRepository from "../repositories/SongsRepository.js";
+import NotFoundException from "../exception/NotFoundException.js";
+import StorageService from "./StorageService.js";
+import * as fs from "node:fs";
 
 class AlbumService {
     constructor() {
         this.albumRepository = new AlbumRepository;
+        this.songsRepository = new SongsRepository;
         this.storageHelper = new StorageHelper;
     }
 
@@ -22,12 +26,16 @@ class AlbumService {
             throw new ResponseException(404, 'fail', 'Album not found');
         }
 
-        result.coverUrl = this.storageHelper.url(`cover/${result.coverUrl}`);
+        if( result.coverUrl ) {
+            result.coverUrl = this.storageHelper.url(`cover/${result.coverUrl}`);
+        }
+
+        result.songs = await this.songsRepository.getSongByAlbumId(id);
 
         return {
             data: {
                 album: result,
-            }
+            },
         };
      }
 
@@ -87,35 +95,26 @@ class AlbumService {
      *
      * @param id
      * @param file
-     * @returns {Promise<void>}
+     * @returns {Promise<{url: (string|null), name: string}>}
      */
      async uploadCover(id, file) {
-         const fileUpload = new FileUpload(file);
-         const extensionList = [
-             'image/jpeg',
-             'image/png',
-         ];
+         const getAlbum = await this.albumRepository.getById(id);
+         const pathName = `cover`;
 
-         if( ! fileUpload.getFilename() || fileUpload.getFilename() === '' ) {
-             throw new ResponseException(400, 'fail', 'File is required');
+         if( ! getAlbum ) {
+             throw new NotFoundException('Album not found');
          }
 
-         if( ! fileUpload.isAllowedMimeType(extensionList) ) {
-             throw new ResponseException(400, 'fail', 'Invalid upload file type. File must be image JPG or PNG');
+         if( getAlbum.coverUrl ) {
+             this.storageHelper.delete(`${pathName}/${getAlbum.coverUrl}`);
          }
 
-         if( await fileUpload.isOverSize(512000) ) {
-             throw new ResponseException(413, 'fail', 'File size must be less than 1MB');
-         }
+         const storageService = new StorageService;
+         const dataFile = await storageService.upload(pathName, file);
 
-        const existsById = await this.albumRepository.existsById(id);
+         await this.albumRepository.updateCover(id, dataFile.name);
 
-        if( ! existsById ) {
-            throw new ResponseException(404, 'fail', 'Album not found');
-        }
-
-        await this.albumRepository.updateCover(id, fileUpload.hashName());
-        fileUpload.store('cover');
+         return dataFile;
      }
 }
 

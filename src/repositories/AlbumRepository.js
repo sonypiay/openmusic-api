@@ -39,16 +39,11 @@ class AlbumRepository {
             values: [id],
         };
 
-        const querySongs = {
-            text: `SELECT id, title, performer FROM songs WHERE album_id = $1`,
-            values: [id]
-        };
-
         const resultAlbum = await this.connection.query(query);
 
         if( ! resultAlbum.rows.length ) return null;
 
-        const result = {
+        return {
             id: resultAlbum.rows[0].id,
             name: resultAlbum.rows[0].name,
             year: resultAlbum.rows[0].year,
@@ -57,14 +52,6 @@ class AlbumRepository {
             updatedAt: resultAlbum.rows[0].updated_at,
             songs: [],
         };
-
-        const resultSongs = await this.connection.query(querySongs);
-
-        if( resultSongs.rows.length > 0 ) {
-            result.songs = resultSongs.rows;
-        }
-
-        return result;
     }
 
     /**

@@ -1,4 +1,6 @@
-import {createWriteStream, existsSync, lstatSync, mkdirSync, unlinkSync} from "node:fs";
+import { v4 as uuidv4 } from 'uuid';
+import * as crypto from "node:crypto";
+import { existsSync } from "node:fs";
 import path from "node:path";
 import ResponseException from "../exception/ResponseException.js";
 import Configuration from "../application/Configuration.js";
@@ -11,6 +13,10 @@ class FileUpload {
 
     setFile(file) {
         this.file = file;
+    }
+
+    getFile() {
+        return this.file;
     }
 
     getFilename() {
@@ -59,38 +65,17 @@ class FileUpload {
         return await this.getSize() > size;
     }
 
-    makeDirectory(directory) {
-        const directoryPath = path.join(this.rootDirectory, directory);
-        const isDirectory = lstatSync(directoryPath).isDirectory();
-        if( isDirectory ) return;
-
-        if( ! existsSync(directoryPath) ) {
-            mkdirSync(directoryPath, { recursive: true });
-        }
-    }
-
-    store(directory) {
-        this.makeDirectory(directory);
-        const directoryPath = path.join(this.rootDirectory, directory);
-        const filePath = path.join(directoryPath, this.hashName());
-        const fileStream = createWriteStream(filePath);
-        this.file.pipe(fileStream);
-
-        return filePath;
-    }
-
-    delete(file) {
-        const filePath = path.join(this.rootDirectory, file);
-
-        if( this.exists(filePath) ) unlinkSync(filePath);
-    }
-
     exists(file) {
         return existsSync(path.join(this.rootDirectory, file ?? ''));
     }
 
     hashName() {
-        return `${Date.now()}_${this.getFilename()}`;
+        const hashValue = crypto
+            .createHash('md5')
+            .update(`${uuidv4()}_${this.getFilename()}`)
+            .digest('hex');
+
+        return `${hashValue}${this.getExtension()}`;
     }
 }
 

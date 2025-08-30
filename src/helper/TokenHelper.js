@@ -29,14 +29,14 @@ class TokenHelper {
 
     getAccessToken() {
         return this.generateToken(
-            Configuration.jwt.accessToken.key,
+            Configuration.jwt.accessToken.secret,
             Configuration.jwt.accessToken.expiresIn,
         );
     }
 
     getRefreshToken() {
         return this.generateToken(
-            Configuration.jwt.refreshToken.key,
+            Configuration.jwt.refreshToken.secret,
             Configuration.jwt.refreshToken.expiresIn,
         );
     }
@@ -49,8 +49,8 @@ class TokenHelper {
         if( ! token ) throw new BadRequestException("Token is required");
 
         const key = type === 'access'
-            ? Configuration.jwt.accessToken.key
-            : Configuration.jwt.refreshToken.key;
+            ? Configuration.jwt.accessToken.secret
+            : Configuration.jwt.refreshToken.secret;
 
         try {
             jwt.verify(token, key);

@@ -187,6 +187,22 @@ class SongsRepository {
 
         await this.connection.query(query);
     }
+
+    /**
+     * Get song by album ID
+     * @param albumId
+     * @returns {Promise<number|[]|string[]|ColumnArray[]|number|string|HTMLCollectionOf<HTMLTableRowElement>|SQLResultSetRowList|*>}
+     */
+    async getSongByAlbumId(albumId) {
+        const sqlText = `SELECT songs.id, songs.title, songs.performer FROM songs WHERE songs.album_id = $1`;
+        const query = {
+            text: sqlText,
+            values: [albumId],
+        };
+
+        const result = await this.connection.query(query);
+        return result.rows;
+    }
 }
 
 export default SongsRepository;

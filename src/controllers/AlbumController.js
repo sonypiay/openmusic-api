@@ -88,11 +88,12 @@ class AlbumController {
         const id = req.params.id;
         const uploadCover = req.payload.cover;
 
-        await this.albumService.uploadCover(id, uploadCover);
+        const result = await this.albumService.uploadCover(id, uploadCover);
 
         return res.response({
             status: "success",
             message: "Cover has been uploaded",
+            ...result,
         }).code(201);
     }
 }
