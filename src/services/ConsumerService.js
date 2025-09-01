@@ -49,7 +49,7 @@ class ConsumerService {
             await this.setQueue(queue);
         }
 
-        console.info(`Connected to queue ${this.getQueue()}`);
+        console.info(`[*] Connected to queue ${this.getQueue()}`);
         console.info(`[*] Waiting for messages in ${this.getQueue()}. To exit press CTRL+C`);
         this.channel.consume(this.getQueue(), callback, { noAck: true });
     }

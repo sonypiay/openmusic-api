@@ -12,7 +12,9 @@ class PlaylistsActivitiesRepository {
      *
      * @param playlistId
      * @param userId
-     * @returns {Promise<*>}
+     * @param songId
+     * @param action
+     * @returns {Promise<string>}
      */
     async store(playlistId, userId, songId, action = 'add') {
         const query = {
@@ -34,7 +36,8 @@ class PlaylistsActivitiesRepository {
     /**
      * Get all log playlist activities
      * @param playlistId
-     * @returns {Promise<[]>}
+     * @param userId
+     * @returns {Promise<[*]>}
      */
     async getAll(playlistId, userId) {
         const sqlText = `

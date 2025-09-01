@@ -47,7 +47,7 @@ class EmailListener {
     }
 
     async handle() {
-        await this.consumerService.listen(this.queue, this.callbackListener.bind(this));
+        await this.consumerService.listen(this.getQueue(), this.callbackListener.bind(this));
     }
 
     async callbackListener(message) {

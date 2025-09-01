@@ -28,20 +28,26 @@ class Listener {
 
     getMaxRetry() {
         const maxRetryArgs = this.args.find(arg => arg.startsWith('--max-retry='));
-        return maxRetryArgs ? parseInt(maxRetryArgs.split('=')[1]) : 3;
+        return maxRetryArgs ? parseInt(maxRetryArgs.split('=')[1]) : 0;
     }
 
     getRetryDelay() {
         const retryDelayArgs = this.args.find(arg => arg.startsWith('--retry-delay='));
-        return retryDelayArgs ? parseInt(retryDelayArgs.split('=')[1]) : 5000;
+        return retryDelayArgs ? parseInt(retryDelayArgs.split('=')[1]) : 0;
     }
 
     async run() {
         const module = await import(`./${this.getFilename()}`);
         const className = new module.default;
 
-        className.setMaxRetry(this.getMaxRetry());
-        className.setRetryDelay(this.getRetryDelay());
+        if( this.getMaxRetry() !== 0 ) {
+            className.setMaxRetry(this.getMaxRetry());
+        }
+
+        if( this.getRetryDelay() !== 0 ) {
+            className.setRetryDelay(this.getRetryDelay());
+        }
+
         className.handle();
     }
 }

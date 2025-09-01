@@ -77,11 +77,12 @@ class ProducerService {
 
     async send(queue) {
         await this.createChannel();
-        console.info(`Connected to queue ${this.getQueue()}`);
 
         if( queue ) {
             await this.setQueue(queue, this.getQueueOptions());
         }
+
+        console.info(`Sending message to queue ${this.getQueue()}`);
 
         await this.channel.sendToQueue(
             this.getQueue(),
