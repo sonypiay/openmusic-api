@@ -7,6 +7,7 @@ import NotFoundException from "../exception/NotFoundException.js";
 import StorageService from "./StorageService.js";
 import UserAlbumLikesRepository from "../repositories/UserAlbumLikesRepository.js";
 import BadRequestException from "../exception/BadRequestException.js";
+import RedisConnection from "../application/RedisConnection.js";
 
 class AlbumService {
     constructor() {
@@ -14,6 +15,7 @@ class AlbumService {
         this.songsRepository = new SongsRepository;
         this.userAlbumLikesRepository = new UserAlbumLikesRepository;
         this.storageHelper = new StorageHelper;
+        this.redisConnection = new RedisConnection;
     }
 
     /**
@@ -157,6 +159,8 @@ class AlbumService {
          }
 
          await this.userAlbumLikesRepository.delete(userId, albumId);
+         const redis = this.redisConnection.init();
+         await redis.del(`album:likes:${albumId}`);
      }
 
     /**
@@ -172,12 +176,22 @@ class AlbumService {
              throw new NotFoundException('Album not found');
          }
 
+         const redis = this.redisConnection.init();
+         const resultCache = await redis.get(`album:likes:${albumId}`);
+
+         if( resultCache ) {
+             return {
+                 likes: parseInt(resultCache),
+                 isCache: true,
+             };
+         }
+
          const result = await this.userAlbumLikesRepository.getLikesCount(albumId);
+         await redis.setex(`album:likes:${albumId}`, 60 * 60, result);
 
          return {
-             data: {
-                 likes: result,
-             },
+             likes: result,
+             isCache: false,
          };
      }
 }

@@ -142,10 +142,18 @@ class AlbumController {
         const id = req.params.id;
         const result = await this.albumService.getLikesCount(id);
 
-        return res.response({
+        const response = res.response({
             status: "success",
-            ...result,
+            data: {
+                likes: result.likes,
+            },
         });
+
+        if( result.isCache === true ) {
+            response.header("X-Data-Source", "cache");
+        }
+
+        return response;
     }
 }
 
