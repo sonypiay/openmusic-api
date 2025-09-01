@@ -5,11 +5,14 @@ import StorageHelper from "../helper/StorageHelper.js";
 import SongsRepository from "../repositories/SongsRepository.js";
 import NotFoundException from "../exception/NotFoundException.js";
 import StorageService from "./StorageService.js";
+import UserAlbumLikesRepository from "../repositories/UserAlbumLikesRepository.js";
+import BadRequestException from "../exception/BadRequestException.js";
 
 class AlbumService {
     constructor() {
         this.albumRepository = new AlbumRepository;
         this.songsRepository = new SongsRepository;
+        this.userAlbumLikesRepository = new UserAlbumLikesRepository;
         this.storageHelper = new StorageHelper;
     }
 
@@ -114,6 +117,68 @@ class AlbumService {
          await this.albumRepository.updateCover(id, dataFile.name);
 
          return dataFile;
+     }
+
+    /**
+     * Add like to album
+     *
+     * @param albumId
+     * @param userId
+     * @returns {Promise<void>}
+     */
+     async addLike(albumId, userId) {
+         const albumExists = await this.albumRepository.existsById(albumId);
+
+         if( ! albumExists ) {
+             throw new NotFoundException('Album not found');
+         }
+
+         const isUserLiked = await this.userAlbumLikesRepository.exists(userId, albumId);
+
+         if( isUserLiked ) {
+             throw new BadRequestException('You have already liked this album');
+         }
+
+        await this.userAlbumLikesRepository.create(userId, albumId);
+     }
+
+    /**
+     * Remove like from album
+     *
+     * @param albumId
+     * @param userId
+     * @returns {Promise<void>}
+     */
+     async removeLike(albumId, userId) {
+         const albumExists = await this.albumRepository.existsById(albumId);
+
+         if( ! albumExists ) {
+             throw new NotFoundException('Album not found');
+         }
+
+         await this.userAlbumLikesRepository.delete(userId, albumId);
+     }
+
+    /**
+     * Get likes count
+     *
+     * @param albumId
+     * @returns {Promise<{data: {likes: number}}>}
+     */
+     async getLikesCount(albumId) {
+         const albumExists = await this.albumRepository.existsById(albumId);
+
+         if( ! albumExists ) {
+             throw new NotFoundException('Album not found');
+         }
+
+         const result = await this.userAlbumLikesRepository.getLikesCount(albumId);
+
+         return {
+             data: {
+                 likes: result,
+             },
+         };
      }
 }
 

@@ -96,6 +96,57 @@ class AlbumController {
             ...result,
         }).code(201);
     }
+
+    /**
+     * Add like album
+     * @param req
+     * @param res
+     * @returns {Promise<*>}
+     */
+    async addLike(req, res) {
+        const id = req.params.id;
+        const userId = req.auth.credentials.user_id;
+        await this.albumService.addLike(id, userId);
+
+        return res.response({
+            status: "success",
+            message: "Album has been liked",
+        }).code(201);
+    }
+
+    /**
+     * Remove like album
+     * @param req
+     * @param res
+     * @returns {Promise<*>}
+     */
+    async removeLike(req, res) {
+        const id = req.params.id;
+        const userId = req.auth.credentials.user_id;
+        await this.albumService.removeLike(id, userId);
+
+        return res.response({
+            status: "success",
+            message: "Album has been unliked",
+        });
+    }
+
+    /**
+     * Get like count album
+     *
+     * @param req
+     * @param res
+     * @returns {Promise<*>}
+     */
+    async getLikesCount(req, res) {
+        const id = req.params.id;
+        const result = await this.albumService.getLikesCount(id);
+
+        return res.response({
+            status: "success",
+            ...result,
+        });
+    }
 }
 
 export default new AlbumController;

@@ -30,8 +30,28 @@ export default [
                 output: 'stream',
                 parse: true,
                 multipart: true,
-                // maxBytes: 10485760,
             },
+        },
+    },
+    {
+        method: 'GET',
+        path: '/albums/{id}/likes',
+        handler: (request, response) => AlbumController.getLikesCount(request, response),
+    },
+    {
+        method: 'POST',
+        path: '/albums/{id}/likes',
+        handler: (request, response) => AlbumController.addLike(request, response),
+        options: {
+            auth: 'token',
+        },
+    },
+    {
+        method: 'DELETE',
+        path: '/albums/{id}/likes',
+        handler: (request, response) => AlbumController.removeLike(request, response),
+        options: {
+            auth: 'token',
         },
     },
 ]
