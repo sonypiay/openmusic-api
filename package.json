@@ -10,10 +10,7 @@
     "dev": "dotenv -- nodemon ./src/main.js",
     "start": "dotenv -- node ./src/main.js",
     "migrate": "dotenv -- node-pg-migrate",
-    "lint": "eslint src/**/*.js",
-    "listener": "dotenv -- node ./src/listeners/Listener.js",
-    "listener:email": "npm run listener -- --class=EmailListener --max-retry=3 --retry-delay=5000",
-    "listener:dlq": "npm run listener -- --class=DeadLetterListener --max-retry=3 --retry-delay=5000"
+    "lint": "eslint src/**/*.js"
   },
   "dependencies": {
     "@hapi/hapi": "^21.4.0",
