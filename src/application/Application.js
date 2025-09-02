@@ -2,6 +2,8 @@ import hapi from '@hapi/hapi';
 import Logging from "./Logging.js";
 import ResponseException from "../exception/ResponseException.js";
 import Configuration from "./Configuration.js";
+import path from "node:path";
+import * as fs from "node:fs";
 
 class Application {
     constructor() {
@@ -61,6 +63,21 @@ class Application {
             }
 
             return h.continue;
+        });
+
+        this.server.route({
+            method: 'GET',
+            path: '/storage/{filename*}',
+            handler: (request, h) => {
+                const filename = request.params.filename;
+                const filePath = path.join(Configuration.storage.local.path, filename);
+
+                if( fs.existsSync(filePath) === false ) {
+                    return h.response('File not found').code(404);
+                }
+
+                return h.file(filePath);
+            },
         });
 
         await this.server.start();
