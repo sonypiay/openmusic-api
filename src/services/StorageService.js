@@ -32,7 +32,7 @@ class StorageService {
         }
 
         if( await fileUpload.isOverSize(512000) ) {
-            throw new ResponseException(413, 'fail', 'File size must be less than 1MB');
+            throw new ResponseException(413, 'fail', 'File size must be less than 500KB');
         }
 
         const fileHashName = fileUpload.hashName();
