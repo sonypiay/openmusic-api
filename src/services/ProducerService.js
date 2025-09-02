@@ -91,8 +91,6 @@ class ProducerService {
                 headers: this.getHeaders(),
             }
         );
-
-        await this.close();
     }
 }
 

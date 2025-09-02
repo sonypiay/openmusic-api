@@ -31,8 +31,6 @@ class StorageHelper {
      */
     makeDirectory(directory) {
         const directoryPath = path.join(this.rootDirectory, directory);
-        const isDirectory = fs.lstatSync(directoryPath).isDirectory();
-        if( isDirectory ) return;
 
         if( ! fs.existsSync(directoryPath) ) {
             fs.mkdirSync(directoryPath, { recursive: true });

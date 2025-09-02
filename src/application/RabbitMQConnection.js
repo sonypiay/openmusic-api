@@ -14,7 +14,7 @@ class RabbitMQConnection {
     }
 
     async connection() {
-        return await amqp.connect(`amqp://${this.getUserCredentials()}${this.getServerUrl()}`, {
+        return await amqp.connect(Configuration.rabbitmq.url, {
             connectionTimeout: Configuration.rabbitmq.timeout,
         });
     }

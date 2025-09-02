@@ -6,7 +6,6 @@ import ForbiddenException from "../exception/ForbiddenException.js";
 import CollaborationsPlaylistRepository from "../repositories/CollaborationsPlaylistRepository.js";
 import PlaylistsActivitiesRepository from "../repositories/PlaylistsActivitiesRepository.js";
 import ProducerService from "./ProducerService.js";
-import { writeFileSync, mkdirSync, existsSync } from "fs";
 
 class PlaylistsService {
     constructor() {
@@ -203,28 +202,13 @@ class PlaylistsService {
             throw new ForbiddenException("You have no permission to export this playlist");
         }
 
-        const resultPlaylist = {
-            playlist: {
-                id: getPlaylist.id,
-                name: getPlaylist.name,
-                songs: await this.playlistsSongRepostitory.getByPlaylistId(playlistId),
-            },
-        };
-
-        const pathName = "export";
         const filename = "playlist_" + getPlaylist.id + ".json";
-        const pathFile = `${pathName}/${filename}`;
         const message = JSON.stringify({
             file: filename,
             email: targetEmail,
             name: getPlaylist.name,
+            playlistId: playlistId,
         });
-
-        if( ! existsSync(pathName) ) {
-            mkdirSync(pathName);
-        }
-
-        writeFileSync(pathFile, JSON.stringify(resultPlaylist));
 
         this.producerService.setMessage(message);
         await this.producerService.send("email");

@@ -1,13 +1,12 @@
-import { existsSync, createReadStream, unlinkSync } from "node:fs";
 import ConsumerService from "../services/ConsumerService.js";
 import Mailer from "../helper/Mailer.js";
 import ProducerService from "../services/ProducerService.js";
-import Logging from "../application/Logging.js";
+import PlaylistsSongRepository from "../repositories/PlaylistsSongRepository.js";
 
 class EmailListener {
     constructor() {
+        this.playlistsSongRepository = new PlaylistsSongRepository;
         this.consumerService = new ConsumerService();
-        this.mailer = new Mailer();
         this.deadQueue = 'dlq';
         this.retryCount = 0;
 
@@ -57,24 +56,25 @@ class EmailListener {
         const data = JSON.parse(message.content.toString());
         this.retryCount = headers['x-retry-count'] ?? this.retryCount;
 
-        if( ! existsSync(`./export/${data.file}`) ) {
-            Logging.error(`File ${data.file} not found!`);
-            return;
-        }
-
         try {
             const emailContent = `<p>Halo <strong>${data.email}</strong>,</p> <p>Playlist <strong>${data.name}</strong> telah diexport ke email anda.</p>`;
-
-            this.mailer.setSubject(`Playlist ${data.name}`);
-            this.mailer.setContent(emailContent);
-            this.mailer.setRecipient(data.email);
-            this.mailer.setAttachments({
-                filename: data.file,
-                content: createReadStream(`./export/${data.file}`),
+            const contentPlaylist = JSON.stringify({
+                id: data.playlistId,
+                name: data.name,
+                songs: await this.playlistsSongRepository.getByPlaylistId(data.playlistId),
             });
 
-            await this.mailer.send();
-            unlinkSync(`./export/${data.file}`);
+            const mailer = new Mailer();
+
+            mailer.setSubject(`Playlist ${data.name}`);
+            mailer.setContent(emailContent);
+            mailer.setRecipient(data.email);
+            mailer.setAttachments({
+                filename: data.file,
+                content: contentPlaylist,
+            });
+
+            await mailer.send();
         } catch (error) {
             console.error(`There was an error while sending email: ${error.message}`);
 
