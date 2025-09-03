@@ -187,7 +187,7 @@ class AlbumService {
          }
 
          const result = await this.userAlbumLikesRepository.getLikesCount(albumId);
-         await redis.setex(`album:likes:${albumId}`, 60 * 60, result);
+         await redis.setex(`album:likes:${albumId}`, 1800, result); // cache expired in 30 minutes
 
          return {
              likes: result,
