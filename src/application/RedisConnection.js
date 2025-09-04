@@ -1,12 +1,13 @@
 import Redis from "ioredis";
+import Configuration from "./Configuration.js";
 
 class RedisConnection {
+    constructor(connection) {
+        this.connection = connection ?? Configuration.redis.url;
+    }
+
     init() {
-        return new Redis({
-            host: process.env.REDIS_HOST,
-            port: process.env.REDIS_PORT,
-            db: process.env.REDIS_DB,
-        });
+        return new Redis(this.connection);
     }
 }
 

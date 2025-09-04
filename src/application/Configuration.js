@@ -25,4 +25,7 @@ export default {
             path: process.env.STORAGE_PATH ?? 'storage',
         },
     },
+    redis: {
+        url: process.env.REDIS_SERVER ?? 'redis://localhost:6379/1',
+    },
 }
