@@ -6,7 +6,7 @@ export default {
         port: process.env.PORT ?? 5000,
     },
     rabbitmq: {
-        url: process.env.RABBITMQ_URL,
+        url: process.env.RABBITMQ_URL ?? 'amqp://localhost:5672/',
     },
     jwt: {
         algorithm: process.env.JWT_ALGORITHM ?? 'HS256',
