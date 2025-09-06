@@ -6,17 +6,17 @@ export default {
         port: process.env.PORT ?? 5000,
     },
     rabbitmq: {
-        url: process.env.RABBITMQ_URL ?? 'amqp://localhost:5672/',
+        url: process.env.RABBITMQ_SERVER ?? 'amqp://localhost:5672/',
     },
     jwt: {
         algorithm: process.env.JWT_ALGORITHM ?? 'HS256',
         accessToken: {
-            secret: process.env.JWT_ACCESS_TOKEN_KEY,
-            expiresIn: process.env.JWT_ACCESS_TOKEN_AGE ?? '1h',
+            secret: process.env.ACCESS_TOKEN_KEY ?? 'hardcodeajalahpusing',
+            expiresIn: process.env.ACCESS_TOKEN_AGE ?? '1h',
         },
         refreshToken: {
-            secret: process.env.JWT_REFRESH_TOKEN_KEY,
-            expiresIn: process.env.JWT_REFRESH_TOKEN_AGE ?? '1h',
+            secret: process.env.REFRESH_TOKEN_KEY ?? 'hardcodeajalahpusing',
+            expiresIn: process.env.REFRESH_TOKEN_AGE ?? '1h',
         },
     },
     storage: {
